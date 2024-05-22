@@ -1,0 +1,51 @@
+.btn {
+  min-width: 36px;
+  color: $primary;
+  border-color: $primary;
+
+  &:hover {
+    color: $white;
+    background-color: $primary;
+    border-color: $primary;
+  }
+
+  &:active {
+    color: $primary !important;
+    border-color: $primary !important;
+  }
+
+  &:focus-visible {
+    color: $primary !important;
+    border-color: $primary !important;
+  }
+}
+
+.btn-primary {
+  color: $white;
+  background-color: $primary;
+  border-color: $primary;
+
+  &:hover {
+    color: $primary;
+    background-color: $white;
+    border-color: $primary;
+  }
+
+  &:active {
+    color: $white !important;
+    background-color: $primary !important;
+    border-color: $primary !important;
+  }
+
+  &:focus-visible {
+    color: $white !important;
+    background-color: $primary !important;
+    border-color: $primary !important;
+  }
+
+  &:disabled {
+    color: $white !important;
+    background-color: $secondary !important;
+    border-color: $secondary !important;
+  }
+}

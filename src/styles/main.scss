@@ -1,0 +1,34 @@
+@import './colors.scss';
+@import './components';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Inter", sans-serif;
+  size: 14px;
+}
+
+p, h1, h2 {
+  padding: 0;
+  margin: 0;
+}
+
+h1, h2 {
+  color: $title;
+}
+
+p, label {
+  color: $text;
+}
+
+ul {
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  list-style: none;
+}
