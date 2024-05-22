@@ -19,5 +19,7 @@ export interface BaseButtonProps {
 }
 
 export interface PollRowComponentProps {
-  questions: IQuestion[];
+  selectOptionsFirst: string[];
+  selectOptionsSecond: string[];
+  selectOptionsThird: string[];
 }

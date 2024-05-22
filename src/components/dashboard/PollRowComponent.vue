@@ -5,7 +5,7 @@
       :multiple="false"
       :clearable="false"
       :label="'Если'"
-      :options="optionsFirst"
+      :options="selectOptionsFirst"
       @change="changeSelectedValFirst"
     />
     <BaseSelect
@@ -13,7 +13,7 @@
       :multiple="true"
       :clearable="false"
       :label="'Ответ'"
-      :options="optionsSecond"
+      :options="selectOptionsSecond"
       @change="changeSelectedValsSecond"
     />
     <BaseSelect
@@ -21,7 +21,7 @@
       :multiple="false"
       :clearable="false"
       :label="'То перейти на'"
-      :options="optionsThird"
+      :options="selectOptionsThird"
       @change="changeSelectedValThird"
     />
     <button class="poll-row__cross-btn">
@@ -31,61 +31,31 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref } from "vue";
 import BaseSelect from "@/components/base/BaseSelect.vue";
 import CrossIcon from "../icons/CrossIcon.vue";
 import type { PollRowComponentProps } from "@/types/props";
 
 const props = defineProps<PollRowComponentProps>();
 
-const selectedValFirst = ref<string>("");
+const selectedValFirst = ref<string>(
+  props.selectOptionsFirst.length === 1 ? props.selectOptionsFirst[0] : ""
+);
 const changeSelectedValFirst = (newValue: string) => {
   selectedValFirst.value = newValue;
+  changeSelectedValsSecond([]);
+  changeSelectedValThird("");
 };
-const optionsFirst = computed(() => {
-  const newOptionsArr = props.questions.map((question) => question.name);
-  const currThirdQuestion = props.questions.find(
-    (question) => question.name === selectedValThird.value
-  );
-  if (currThirdQuestion) {
-    const indexOfThird = newOptionsArr.indexOf(selectedValThird.value);
-    if (indexOfThird !== -1) {
-      newOptionsArr.splice(indexOfThird, 1);
-    }
-  }
-  return newOptionsArr;
-});
 
 const selectedValsSecond = ref<string[]>([]);
 const changeSelectedValsSecond = (newValue: string[]) => {
   selectedValsSecond.value = newValue;
 };
-const optionsSecond = computed(() => {
-  const currFirstQuestion = props.questions.find(
-    (question) => question.name === selectedValFirst.value
-  );
-  selectedValsSecond.value = [];
-  return currFirstQuestion
-    ? currFirstQuestion.choices.map((choice) => choice.value)
-    : [];
-});
 
 const selectedValThird = ref<string>("");
 const changeSelectedValThird = (newValue: string) => {
   selectedValThird.value = newValue;
 };
-const optionsThird = computed(() => {
-  const currFirstQuestion = props.questions.find(
-    (question) => question.name === selectedValFirst.value
-  );
-  const newOptionsArr = props.questions.map((question) => question.name);
-  const indexOfFirst = newOptionsArr.indexOf(selectedValFirst.value);
-  if (indexOfFirst !== -1) {
-    newOptionsArr.splice(indexOfFirst, 1);
-  }
-  newOptionsArr.push("Завершено");
-  return currFirstQuestion ? newOptionsArr : [];
-});
 </script>
 
 <style lang="scss">
