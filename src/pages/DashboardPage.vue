@@ -4,12 +4,12 @@
 
     <div class="main-block">
       <h1 class="px-5">Создание опроса</h1>
-      <div class="logic px-5">
+      <div class="logic">
         <TabsNavigation />
 
         <div class="d-flex align-items-center">
           <BaseSwitcher v-model="isLogicDiagram" />
-          <p class="ms-3 fs-5">Схема логики</p>
+          <p class="switch-label">Схема логики</p>
         </div>
       </div>
 
@@ -44,12 +44,29 @@ const isLogicDiagram = ref<boolean>(false);
   width: 100%;
   margin: 0;
   padding: 2.5rem 0 2.5rem 17.5rem;
+  @media (max-width: 1280px) {
+    padding: 2.5rem 0 2.5rem 0;
+  }
 }
 
 .logic {
   display: flex;
   justify-content: space-between;
-  padding: 2.25rem 0;
+  padding: 2.25rem;
+  @media (max-width: 1280px) {
+    padding: 1.5rem;
+  }
+}
+
+.switch-label {
+  margin-left: 8px;
+  font-size: 20px;
+  @media (max-width: 1024px) {
+    font-size: 18px;
+  }
+  @media (max-width: 864px) {
+    font-size: 16px;
+  }
 }
 
 .logic-buttons {

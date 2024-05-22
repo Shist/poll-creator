@@ -1,6 +1,6 @@
 <template>
   <button
-    class="btn d-flex align-items-center justify-content-center"
+    class="btn d-flex align-items-center justify-content-center base-btn"
     :disabled="disabled"
   >
     {{ name }}

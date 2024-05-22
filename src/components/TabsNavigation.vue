@@ -73,6 +73,13 @@ ul {
       }
     }
 
+    p {
+      font-size: 20px;
+      @media (max-width: 864px) {
+        font-size: 16px;
+      }
+    }
+
     span {
       display: flex;
       justify-content: center;
