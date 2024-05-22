@@ -1,10 +1,17 @@
 <template>
-  <div></div>
+  <div class="poll-wrapper">
+    <h2 class="poll-wrapper__headline">Создание логики</h2>
+    <p class="poll-wrapper__text">
+      Пожалуйста, для успешной настройки логики заполните сценарии для всех
+      вопросов и всех вариантов ответов.
+    </p>
+    <PollRowComponent :questions="questions" />
+  </div>
 </template>
 
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
-
+import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
 import type { IQuestion } from "@/types/data/questions";
 
 const questions = ref<IQuestion[]>([]);
@@ -108,3 +115,18 @@ onMounted(() => {
   ];
 });
 </script>
+
+<style lang="scss">
+.poll-wrapper {
+  padding-inline: 2.25rem;
+  @media (max-width: 1280px) {
+    padding: 1.5rem;
+  }
+  &__headline {
+    margin-bottom: 20px;
+  }
+  &__text {
+    margin-bottom: 15px;
+  }
+}
+</style>

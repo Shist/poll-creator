@@ -14,6 +14,7 @@
       </div>
 
       <!-- Тут нужно добавить компоненту для отображения формы и графа -->
+      <PollComponent />
 
       <div class="logic-buttons">
         <BaseButton
@@ -33,6 +34,7 @@ import BaseButton from "@/components/base/BaseButton.vue";
 import AsideNavigation from "@/components/AsideNavigation.vue";
 import TabsNavigation from "@/components/TabsNavigation.vue";
 import BaseSwitcher from "@/components/base/BaseSwitcher.vue";
+import PollComponent from "@/components/dashboard/PollComponent.vue";
 
 const isLogicDiagram = ref<boolean>(false);
 </script>
