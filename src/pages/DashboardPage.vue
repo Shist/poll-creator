@@ -13,17 +13,19 @@
         </div>
       </div>
 
-      <keep-alive>
-        <component
-          :is="isLogicDiagram ? GraphComponent : PollComponent"
-          :questions="questions"
-        ></component>
-      </keep-alive>
+      <GraphComponent v-if="isLogicDiagram" :questions="questions" />
+      <PollComponent
+        v-else
+        :questions="questions"
+        :areLeftQuestionsValues="Object.keys(leftQuestionsValuesIds).length > 0"
+        @changed="handleQuestionsChange"
+      />
 
       <div class="logic-buttons">
         <BaseButton
           name="Публикация опроса"
           class="btn-primary btn-width me-4"
+          :disabled="Object.keys(leftQuestionsValuesIds).length > 0"
         />
         <BaseButton name="Отмена" class="btn-width" />
       </div>
@@ -32,117 +34,35 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
-
+import { ref, computed, onMounted, ComputedRef } from "vue";
+import { useStore } from "vuex";
 import BaseButton from "@/components/base/BaseButton.vue";
 import AsideNavigation from "@/components/AsideNavigation.vue";
 import TabsNavigation from "@/components/TabsNavigation.vue";
 import BaseSwitcher from "@/components/base/BaseSwitcher.vue";
 import PollComponent from "@/components/dashboard/PollComponent.vue";
 import GraphComponent from "@/components/dashboard/GraphComponent.vue";
-import type { IQuestion } from "@/types/data/questions";
+import type {
+  IQuestion,
+  ILeftQuestionsValuesIds,
+} from "@/types/data/questions";
+import { questionsFromServer } from "@/data";
 
 const isLogicDiagram = ref<boolean>(false);
 
-const questions = ref<IQuestion[]>([]);
+const store = useStore();
+
+const questions: ComputedRef<IQuestion[]> = computed(
+  () => store.state.pollData.questions
+);
+const leftQuestionsValuesIds: ComputedRef<ILeftQuestionsValuesIds> = computed(
+  () => store.state.pollData.leftQuestionsValuesIds
+);
+
+const handleQuestionsChange = (newQuestions: IQuestion[]) => {};
 
 onMounted(() => {
-  questions.value = [
-    {
-      id: 1,
-      name: "Какие языки вы знаете?",
-      choices: [
-        {
-          id: 1,
-          value: "JS",
-          next_question: 2,
-        },
-        {
-          id: 2,
-          value: "NodeJS",
-          next_question: 2,
-        },
-        {
-          id: 3,
-          value: "TS",
-          next_question: 2,
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Какие фреймворки вы знаете/изучали?",
-      choices: [
-        {
-          id: 4,
-          value: "Vue",
-          next_question: 3,
-        },
-        {
-          id: 5,
-          value: "React",
-          next_question: 3,
-        },
-        {
-          id: 6,
-          value: "Angular",
-          next_question: 3,
-        },
-        {
-          id: 7,
-          value: "Express",
-          next_question: null,
-        },
-        {
-          id: 8,
-          value: "Nest",
-          next_question: null,
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: "Какие паттерны проектирования вы применяли на проектах?",
-      choices: [
-        {
-          id: 9,
-          value: "Фабричный",
-          next_question: 4,
-        },
-        {
-          id: 10,
-          value: "Строитель",
-          next_question: 4,
-        },
-        {
-          id: 11,
-          value: "Стратегия",
-          next_question: 4,
-        },
-        {
-          id: 12,
-          value: "Модуль",
-          next_question: 4,
-        },
-      ],
-    },
-    {
-      id: 4,
-      name: "Какие бенефиты вы бы хотели иметь?",
-      choices: [
-        {
-          id: 13,
-          value: "Тренажерный зал",
-          next_question: null,
-        },
-        {
-          id: 14,
-          value: "Курсы англиского",
-          next_question: null,
-        },
-      ],
-    },
-  ];
+  store.commit("pollData/setQuestions", questionsFromServer);
 });
 </script>
 

@@ -33,10 +33,18 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import BaseSelect from "@/components/base/BaseSelect.vue";
+import { IQuestion } from "@/types/data/questions";
 import CrossIcon from "../icons/CrossIcon.vue";
-import type { PollRowComponentProps } from "@/types/props";
 
-const props = defineProps<PollRowComponentProps>();
+const props = defineProps<{
+  questions: IQuestion[];
+  currQuestionId: number;
+  selectOptionsFirst: string[];
+  selectOptionsSecond: string[];
+  selectOptionsThird: string[];
+}>();
+
+const emit = defineEmits<{ changed: [value: IQuestion[]] }>();
 
 const selectedValFirst = ref<string>(
   props.selectOptionsFirst.length === 1 ? props.selectOptionsFirst[0] : ""
@@ -59,6 +67,14 @@ const selectedValThird = ref<string>(
 );
 const changeSelectedValThird = (newValue: string) => {
   selectedValThird.value = newValue;
+
+  const newQuestions: IQuestion[] = JSON.parse(JSON.stringify(props.questions));
+
+  newQuestions[props.currQuestionId].choices.forEach((choice) => {
+    delete choice.next_question;
+  });
+
+  emit("changed", newQuestions);
 };
 </script>
 

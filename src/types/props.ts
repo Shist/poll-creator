@@ -15,9 +15,3 @@ export interface BaseButtonProps {
   name: string;
   disabled?: boolean;
 }
-
-export interface PollRowComponentProps {
-  selectOptionsFirst: string[];
-  selectOptionsSecond: string[];
-  selectOptionsThird: string[];
-}

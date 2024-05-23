@@ -8,11 +8,19 @@
     <div class="poll-wrapper__poll-rows-wrapper">
       <PollRowComponent
         v-for="pollRow in pollRowsArr"
+        :key="pollRow.rowId"
+        :questions="questions"
+        :currQuestionId="pollRow.currQuestionId"
         :selectOptionsFirst="pollRow.selectOptionsFirst"
         :selectOptionsSecond="pollRow.selectOptionsSecond"
         :selectOptionsThird="pollRow.selectOptionsThird"
+        @changed="(newQuestions) => emit('changed', newQuestions)"
       />
-      <button @click="addPollRow" class="poll-wrapper__add-poll-row-btn">
+      <button
+        @click="addPollRow"
+        class="poll-wrapper__add-poll-row-btn"
+        v-show="areLeftQuestionsValues"
+      >
         + Добавить условие
       </button>
     </div>
@@ -22,10 +30,12 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
-import type { PollRowComponentProps } from "@/types/props";
 import { IQuestion } from "@/types/data/questions";
 
-const props = defineProps<{ questions: IQuestion[] }>();
+const props = defineProps<{
+  questions: IQuestion[];
+  areLeftQuestionsValues: boolean;
+}>();
 
 const emit = defineEmits<{ changed: [value: IQuestion[]] }>();
 
@@ -34,25 +44,29 @@ const addPollRow = () => {
 };
 
 const pollRowsArr = computed(() => {
-  const result: PollRowComponentProps[] = [];
-  props.questions.forEach((questionObj) => {
+  const result = [];
+  props.questions.forEach((questionObj, questionIndex) => {
     const questionChains = {} as { [key: number]: string[] };
     questionObj.choices.forEach((choice) => {
       questionChains[choice.next_question]
         ? questionChains[choice.next_question].push(choice.value)
         : (questionChains[choice.next_question] = [choice.value]);
     });
-    Object.entries(questionChains).forEach(([nextQuestionId, valuesArr]) => {
-      const nextQuestion = props.questions.find(
-        (question) => question.id === Number(nextQuestionId)
-      );
-      const nextPollRow: PollRowComponentProps = {
-        selectOptionsFirst: [questionObj.name],
-        selectOptionsSecond: valuesArr,
-        selectOptionsThird: [nextQuestion ? nextQuestion.name : "Завершено"],
-      };
-      result.push(nextPollRow);
-    });
+    Object.entries(questionChains).forEach(
+      ([nextQuestionId, valuesArr], chainIndex) => {
+        const nextQuestion = props.questions.find(
+          (question) => question.id === Number(nextQuestionId)
+        );
+        const nextPollRow = {
+          rowId: `${questionIndex}-${chainIndex}`,
+          currQuestionId: questionIndex,
+          selectOptionsFirst: [questionObj.name],
+          selectOptionsSecond: valuesArr,
+          selectOptionsThird: [nextQuestion ? nextQuestion.name : "Завершено"],
+        };
+        result.push(nextPollRow);
+      }
+    );
   });
   return result;
 });
