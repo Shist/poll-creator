@@ -3,27 +3,21 @@
 </template>
 
 <script lang="ts" setup>
-import { watch } from "vue";
-
+import { onMounted } from "vue";
 import { useGraph } from "@/composables/useGraph";
-
 import type { IQuestion } from "@/types/data/questions";
 
 const { initCytoscapeGraph } = useGraph();
 
 const props = defineProps<{ questions: IQuestion[] }>();
 
-watch(
-  () => props.questions,
-  (val) => {
-    initCytoscapeGraph(val);
-  },
-  { deep: true, immediate: true }
-);
+onMounted(() => {
+  initCytoscapeGraph(props.questions);
+});
 </script>
 
 <style lang="scss">
-@import "../../../styles/colors.scss";
+@import "../../styles/colors.scss";
 
 #cytoscape-graph {
   height: 60vh;

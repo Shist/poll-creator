@@ -14,7 +14,12 @@
       </div>
 
       <!-- Тут нужно добавить компоненту для отображения формы и графа -->
-      <PollComponent />
+      <keep-alive>
+        <component
+          :is="isLogicDiagram ? PollComponent : GraphComponent"
+          :questions="questions"
+        ></component>
+      </keep-alive>
 
       <div class="logic-buttons">
         <BaseButton
@@ -28,15 +33,118 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 
 import BaseButton from "@/components/base/BaseButton.vue";
 import AsideNavigation from "@/components/AsideNavigation.vue";
 import TabsNavigation from "@/components/TabsNavigation.vue";
 import BaseSwitcher from "@/components/base/BaseSwitcher.vue";
 import PollComponent from "@/components/dashboard/PollComponent.vue";
+import GraphComponent from "@/components/dashboard/GraphComponent.vue";
+import type { IQuestion } from "@/types/data/questions";
 
-const isLogicDiagram = ref<boolean>(false);
+const isLogicDiagram = ref<boolean>(true);
+
+const questions = ref<IQuestion[]>([]);
+
+onMounted(() => {
+  questions.value = [
+    {
+      id: 1,
+      name: "Какие языки вы знаете?",
+      choices: [
+        {
+          id: 1,
+          value: "JS",
+          next_question: 2,
+        },
+        {
+          id: 2,
+          value: "NodeJS",
+          next_question: 2,
+        },
+        {
+          id: 3,
+          value: "TS",
+          next_question: 2,
+        },
+      ],
+    },
+    {
+      id: 2,
+      name: "Какие фреймворки вы знаете/изучали?",
+      choices: [
+        {
+          id: 4,
+          value: "Vue",
+          next_question: 3,
+        },
+        {
+          id: 5,
+          value: "React",
+          next_question: 3,
+        },
+        {
+          id: 6,
+          value: "Angular",
+          next_question: 3,
+        },
+        {
+          id: 7,
+          value: "Express",
+          next_question: null,
+        },
+        {
+          id: 8,
+          value: "Nest",
+          next_question: null,
+        },
+      ],
+    },
+    {
+      id: 3,
+      name: "Какие паттерны проектирования вы применяли на проектах?",
+      choices: [
+        {
+          id: 9,
+          value: "Фабричный",
+          next_question: 4,
+        },
+        {
+          id: 10,
+          value: "Строитель",
+          next_question: 4,
+        },
+        {
+          id: 11,
+          value: "Стратегия",
+          next_question: 4,
+        },
+        {
+          id: 12,
+          value: "Модуль",
+          next_question: 4,
+        },
+      ],
+    },
+    {
+      id: 4,
+      name: "Какие бенефиты вы бы хотели иметь?",
+      choices: [
+        {
+          id: 13,
+          value: "Тренажерный зал",
+          next_question: null,
+        },
+        {
+          id: 14,
+          value: "Курсы англиского",
+          next_question: null,
+        },
+      ],
+    },
+  ];
+});
 </script>
 
 <style lang="scss" scoped>
@@ -45,9 +153,9 @@ const isLogicDiagram = ref<boolean>(false);
 .main-block {
   width: 100%;
   margin: 0;
-  padding: 2.5rem 0 2.5rem 17.5rem;
+  padding: 2.5rem 0 103px 17.5rem;
   @media (max-width: 1280px) {
-    padding: 2.5rem 0 2.5rem 0;
+    padding: 2.5rem 0 103px 0;
   }
 }
 
