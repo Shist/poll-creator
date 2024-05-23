@@ -13,10 +13,9 @@
         </div>
       </div>
 
-      <!-- Тут нужно добавить компоненту для отображения формы и графа -->
       <keep-alive>
         <component
-          :is="isLogicDiagram ? PollComponent : GraphComponent"
+          :is="isLogicDiagram ? GraphComponent : PollComponent"
           :questions="questions"
         ></component>
       </keep-alive>
@@ -43,7 +42,7 @@ import PollComponent from "@/components/dashboard/PollComponent.vue";
 import GraphComponent from "@/components/dashboard/GraphComponent.vue";
 import type { IQuestion } from "@/types/data/questions";
 
-const isLogicDiagram = ref<boolean>(true);
+const isLogicDiagram = ref<boolean>(false);
 
 const questions = ref<IQuestion[]>([]);
 

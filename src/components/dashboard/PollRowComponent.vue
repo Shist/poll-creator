@@ -47,12 +47,16 @@ const changeSelectedValFirst = (newValue: string) => {
   changeSelectedValThird("");
 };
 
-const selectedValsSecond = ref<string[]>([]);
+const selectedValsSecond = ref<string[]>(
+  props.selectOptionsSecond.length ? props.selectOptionsSecond : []
+);
 const changeSelectedValsSecond = (newValue: string[]) => {
   selectedValsSecond.value = newValue;
 };
 
-const selectedValThird = ref<string>("");
+const selectedValThird = ref<string>(
+  props.selectOptionsThird.length === 1 ? props.selectOptionsThird[0] : ""
+);
 const changeSelectedValThird = (newValue: string) => {
   selectedValThird.value = newValue;
 };

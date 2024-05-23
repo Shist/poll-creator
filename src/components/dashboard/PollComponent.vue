@@ -20,26 +20,42 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
+import { computed } from "vue";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
 import type { PollRowComponentProps } from "@/types/props";
 import { IQuestion } from "@/types/data/questions";
 
+const props = defineProps<{ questions: IQuestion[] }>();
+
 const emit = defineEmits<{ changed: [value: IQuestion[]] }>();
 
-const pollRowsArr = ref<PollRowComponentProps[]>([]);
-let currQuestionId = 1;
-let nextQuestionId = 1;
-
 const addPollRow = () => {
-  const nextPollRow: PollRowComponentProps = {
-    selectOptionsFirst: [],
-    selectOptionsSecond: [],
-    selectOptionsThird: [],
-  };
-
-  pollRowsArr.value.push(nextPollRow);
+  // do something
 };
+
+const pollRowsArr = computed(() => {
+  const result: PollRowComponentProps[] = [];
+  props.questions.forEach((questionObj) => {
+    const questionChains = {} as { [key: number]: string[] };
+    questionObj.choices.forEach((choice) => {
+      questionChains[choice.next_question]
+        ? questionChains[choice.next_question].push(choice.value)
+        : (questionChains[choice.next_question] = [choice.value]);
+    });
+    Object.entries(questionChains).forEach(([nextQuestionId, valuesArr]) => {
+      const nextQuestion = props.questions.find(
+        (question) => question.id === Number(nextQuestionId)
+      );
+      const nextPollRow: PollRowComponentProps = {
+        selectOptionsFirst: [questionObj.name],
+        selectOptionsSecond: valuesArr,
+        selectOptionsThird: [nextQuestion ? nextQuestion.name : "Завершено"],
+      };
+      result.push(nextPollRow);
+    });
+  });
+  return result;
+});
 </script>
 
 <style lang="scss">
