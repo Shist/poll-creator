@@ -13,13 +13,8 @@
         </div>
       </div>
 
-      <GraphComponent v-if="isLogicDiagram" :questions="questions" />
-      <PollComponent
-        v-else
-        :questions="questions"
-        :areLeftQuestionsValues="Object.keys(leftQuestionsValuesIds).length > 0"
-        @changed="handleQuestionsChange"
-      />
+      <GraphComponent v-if="isLogicDiagram" />
+      <PollComponent v-else />
 
       <div class="logic-buttons">
         <BaseButton
@@ -43,26 +38,46 @@ import BaseSwitcher from "@/components/base/BaseSwitcher.vue";
 import PollComponent from "@/components/dashboard/PollComponent.vue";
 import GraphComponent from "@/components/dashboard/GraphComponent.vue";
 import type {
-  IQuestion,
+  IPollRow,
   ILeftQuestionsValuesIds,
+  INextQuestionsValuesIds,
 } from "@/types/data/questions";
 import { questionsFromServer } from "@/data";
 
 const isLogicDiagram = ref<boolean>(false);
 
 const store = useStore();
-
-const questions: ComputedRef<IQuestion[]> = computed(
-  () => store.state.pollData.questions
+const pollRows: ComputedRef<IPollRow[]> = computed(
+  () => store.state.pollData.pollRows
 );
 const leftQuestionsValuesIds: ComputedRef<ILeftQuestionsValuesIds> = computed(
   () => store.state.pollData.leftQuestionsValuesIds
 );
 
-const handleQuestionsChange = (newQuestions: IQuestion[]) => {};
-
 onMounted(() => {
-  store.commit("pollData/setQuestions", questionsFromServer);
+  const result: IPollRow[] = [];
+  questionsFromServer.forEach((questionObj, questionIndex) => {
+    const questionChains = {} as INextQuestionsValuesIds;
+    questionObj.choices.forEach((choice) => {
+      if (choice.next_question !== null) {
+        questionChains[choice.next_question]
+          ? questionChains[choice.next_question].push(choice.id)
+          : (questionChains[choice.next_question] = [choice.id]);
+      }
+    });
+    Object.entries(questionChains).forEach(
+      ([nextQuestionId, valuesIdsArr], chainIndex) => {
+        const nextPollRow: IPollRow = {
+          rowId: `${questionIndex}-${chainIndex}`,
+          questionIds: [questionObj.id],
+          selectedValuesIds: valuesIdsArr,
+          nextQuestionIds: [Number(nextQuestionId)],
+        };
+        result.push(nextPollRow);
+      }
+    );
+  });
+  store.commit("pollData/setPollRow", result);
 });
 </script>
 

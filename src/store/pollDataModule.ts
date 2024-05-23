@@ -1,8 +1,13 @@
 import { defineModule } from "direct-vuex";
-import { IQuestion, ILeftQuestionsValuesIds } from "@/types/data/questions";
+import {
+  IQuestion,
+  IPollRow,
+  ILeftQuestionsValuesIds,
+} from "@/types/data/questions";
 
 export interface IThemeState {
   questions: IQuestion[];
+  pollRows: IPollRow[];
   leftQuestionsValuesIds: ILeftQuestionsValuesIds;
 }
 
@@ -10,6 +15,7 @@ const pollDataModule = defineModule({
   state: (): IThemeState => ({
     questions: [],
     leftQuestionsValuesIds: {},
+    pollRows: [],
   }),
   getters: {},
   mutations: {
@@ -21,6 +27,9 @@ const pollDataModule = defineModule({
       leftQuestionsValuesIds: ILeftQuestionsValuesIds
     ) {
       state.leftQuestionsValuesIds = leftQuestionsValuesIds;
+    },
+    setPollRows(state, pollRows: IPollRow[]) {
+      state.pollRows = pollRows;
     },
   },
   actions: {},

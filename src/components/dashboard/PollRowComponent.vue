@@ -44,8 +44,6 @@ const props = defineProps<{
   selectOptionsThird: string[];
 }>();
 
-const emit = defineEmits<{ changed: [value: IQuestion[]] }>();
-
 const selectedValFirst = ref<string>(
   props.selectOptionsFirst.length === 1 ? props.selectOptionsFirst[0] : ""
 );
@@ -74,7 +72,7 @@ const changeSelectedValThird = (newValue: string) => {
     delete choice.next_question;
   });
 
-  emit("changed", newQuestions);
+  //emit("changed", newQuestions);
 };
 </script>
 
