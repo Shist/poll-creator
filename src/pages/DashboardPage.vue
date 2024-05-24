@@ -47,9 +47,6 @@ import { questionsFromServer } from "@/data";
 const isLogicDiagram = ref<boolean>(false);
 
 const store = useStore();
-const pollRows: ComputedRef<IPollRow[]> = computed(
-  () => store.state.pollData.pollRows
-);
 const leftQuestionsValuesIds: ComputedRef<ILeftQuestionsValuesIds> = computed(
   () => store.state.pollData.leftQuestionsValuesIds
 );
@@ -63,6 +60,10 @@ onMounted(() => {
         questionChains[choice.next_question]
           ? questionChains[choice.next_question].push(choice.id)
           : (questionChains[choice.next_question] = [choice.id]);
+      } else {
+        questionChains["finish"]
+          ? questionChains["finish"].push(choice.id)
+          : (questionChains["finish"] = [choice.id]);
       }
     });
     Object.entries(questionChains).forEach(
@@ -71,13 +72,18 @@ onMounted(() => {
           rowId: `${questionIndex}-${chainIndex}`,
           questionIds: [questionObj.id],
           selectedValuesIds: valuesIdsArr,
-          nextQuestionIds: [Number(nextQuestionId)],
+          nextQuestionIds: [
+            nextQuestionId !== "finish"
+              ? Number(nextQuestionId)
+              : nextQuestionId,
+          ],
         };
         result.push(nextPollRow);
       }
     );
   });
-  store.commit("pollData/setPollRow", result);
+  store.commit("pollData/setQuestions", questionsFromServer);
+  store.commit("pollData/setPollRows", result);
 });
 </script>
 

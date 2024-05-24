@@ -14,7 +14,7 @@ export interface IPollRow {
   rowId: string;
   questionIds: number[];
   selectedValuesIds: number[];
-  nextQuestionIds: number[];
+  nextQuestionIds: (number | "finish")[];
 }
 
 // Объект, у которого

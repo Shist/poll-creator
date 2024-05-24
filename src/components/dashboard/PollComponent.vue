@@ -7,13 +7,11 @@
     </p>
     <div class="poll-wrapper__poll-rows-wrapper">
       <PollRowComponent
-        v-for="pollRow in pollRowsArr"
+        v-for="pollRow in pollRows"
         :key="pollRow.rowId"
-        :questions="questions"
-        :currQuestionId="pollRow.currQuestionId"
-        :selectOptionsFirst="pollRow.selectOptionsFirst"
-        :selectOptionsSecond="pollRow.selectOptionsSecond"
-        :selectOptionsThird="pollRow.selectOptionsThird"
+        :questionIds="pollRow.questionIds"
+        :selectedValuesIds="pollRow.selectedValuesIds"
+        :nextQuestionIds="pollRow.nextQuestionIds"
       />
       <button
         @click="addPollRow"
@@ -30,17 +28,9 @@
 import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
-import {
-  IQuestion,
-  IPollRow,
-  ILeftQuestionsValuesIds,
-  INextQuestionsValuesIds,
-} from "@/types/data/questions";
+import { IPollRow, ILeftQuestionsValuesIds } from "@/types/data/questions";
 
 const store = useStore();
-const questions: ComputedRef<IQuestion[]> = computed(
-  () => store.state.pollData.questions
-);
 const pollRows: ComputedRef<IPollRow[]> = computed(
   () => store.state.pollData.pollRows
 );
@@ -51,34 +41,6 @@ const leftQuestionsValuesIds: ComputedRef<ILeftQuestionsValuesIds> = computed(
 const addPollRow = () => {
   // do something
 };
-
-const pollRowsArr = computed(() => {
-  const result = [];
-  questions.value.forEach((questionObj, questionIndex) => {
-    const questionChains = {} as INextQuestionsValuesIds;
-    questionObj.choices.forEach((choice) => {
-      questionChains[choice.next_question]
-        ? questionChains[choice.next_question].push(choice.id)
-        : (questionChains[choice.next_question] = [choice.id]);
-    });
-    Object.entries(questionChains).forEach(
-      ([nextQuestionId, valuesIdsArr], chainIndex) => {
-        const nextQuestion = questions.value.find(
-          (question) => question.id === Number(nextQuestionId)
-        );
-        const nextPollRow = {
-          rowId: `${questionIndex}-${chainIndex}`,
-          currQuestionId: questionIndex,
-          selectOptionsFirst: [questionObj.name],
-          selectOptionsSecond: valuesIdsArr,
-          selectOptionsThird: [nextQuestion ? nextQuestion.name : "Завершено"],
-        };
-        result.push(nextPollRow);
-      }
-    );
-  });
-  return result;
-});
 </script>
 
 <style lang="scss">
