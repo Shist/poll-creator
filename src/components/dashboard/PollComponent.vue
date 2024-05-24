@@ -9,14 +9,17 @@
       <PollRowComponent
         v-for="pollRow in pollRows"
         :key="pollRow.rowId"
-        :questionIds="pollRow.questionIds"
-        :selectedValuesIds="pollRow.selectedValuesIds"
-        :nextQuestionIds="pollRow.nextQuestionIds"
+        :selectValFirst="pollRow.selectValFirst"
+        :selectOptionsFirst="pollRow.selectOptionsFirst"
+        :selectValsSecond="pollRow.selectValsSecond"
+        :selectOptionsSecond="pollRow.selectOptionsSecond"
+        :selectValThird="pollRow.selectValThird"
+        :selectOptionsThird="pollRow.selectOptionsThird"
       />
       <button
         @click="addPollRow"
         class="poll-wrapper__add-poll-row-btn"
-        v-show="Object.keys(leftQuestionsValuesIds).length > 0"
+        v-show="!store.getters['pollData/areAllChoicesPresent']"
       >
         + Добавить условие
       </button>
@@ -28,14 +31,11 @@
 import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
-import { IPollRow, ILeftQuestionsValuesIds } from "@/types/data/questions";
+import { IPollRowStructure } from "@/types/data/questions";
 
 const store = useStore();
-const pollRows: ComputedRef<IPollRow[]> = computed(
+const pollRows: ComputedRef<IPollRowStructure[]> = computed(
   () => store.state.pollData.pollRows
-);
-const leftQuestionsValuesIds: ComputedRef<ILeftQuestionsValuesIds> = computed(
-  () => store.state.pollData.leftQuestionsValuesIds
 );
 
 const addPollRow = () => {

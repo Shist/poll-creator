@@ -20,7 +20,7 @@
         <BaseButton
           name="Публикация опроса"
           class="btn-primary btn-width me-4"
-          :disabled="Object.keys(leftQuestionsValuesIds).length > 0"
+          :disabled="!store.getters['pollData/areAllChoicesPresent']"
         />
         <BaseButton name="Отмена" class="btn-width" />
       </div>
@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, onMounted, ComputedRef } from "vue";
+import { ref, onMounted } from "vue";
 import { useStore } from "vuex";
 import BaseButton from "@/components/base/BaseButton.vue";
 import AsideNavigation from "@/components/AsideNavigation.vue";
@@ -37,53 +37,19 @@ import TabsNavigation from "@/components/TabsNavigation.vue";
 import BaseSwitcher from "@/components/base/BaseSwitcher.vue";
 import PollComponent from "@/components/dashboard/PollComponent.vue";
 import GraphComponent from "@/components/dashboard/GraphComponent.vue";
-import type {
-  IPollRow,
-  ILeftQuestionsValuesIds,
-  INextQuestionsValuesIds,
-} from "@/types/data/questions";
 import { questionsFromServer } from "@/data";
 
 const isLogicDiagram = ref<boolean>(false);
 
 const store = useStore();
-const leftQuestionsValuesIds: ComputedRef<ILeftQuestionsValuesIds> = computed(
-  () => store.state.pollData.leftQuestionsValuesIds
-);
 
 onMounted(() => {
-  const result: IPollRow[] = [];
-  questionsFromServer.forEach((questionObj, questionIndex) => {
-    const questionChains = {} as INextQuestionsValuesIds;
-    questionObj.choices.forEach((choice) => {
-      if (choice.next_question !== null) {
-        questionChains[choice.next_question]
-          ? questionChains[choice.next_question].push(choice.id)
-          : (questionChains[choice.next_question] = [choice.id]);
-      } else {
-        questionChains["finish"]
-          ? questionChains["finish"].push(choice.id)
-          : (questionChains["finish"] = [choice.id]);
-      }
-    });
-    Object.entries(questionChains).forEach(
-      ([nextQuestionId, valuesIdsArr], chainIndex) => {
-        const nextPollRow: IPollRow = {
-          rowId: `${questionIndex}-${chainIndex}`,
-          questionIds: [questionObj.id],
-          selectedValuesIds: valuesIdsArr,
-          nextQuestionIds: [
-            nextQuestionId !== "finish"
-              ? Number(nextQuestionId)
-              : nextQuestionId,
-          ],
-        };
-        result.push(nextPollRow);
-      }
-    );
-  });
-  store.commit("pollData/setQuestions", questionsFromServer);
-  store.commit("pollData/setPollRows", result);
+  store.commit("pollData/setServerQuestions", questionsFromServer);
+  store.commit("pollData/setUserQuestions", questionsFromServer);
+  store.commit(
+    "pollData/setPollRows",
+    store.getters["pollData/getPollRowsStructure"]("init")
+  );
 });
 </script>
 

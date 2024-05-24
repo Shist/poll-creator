@@ -12,12 +12,12 @@ const { initCytoscapeGraph } = useGraph();
 
 const store = useStore();
 
-const questions: ComputedRef<IQuestion[]> = computed(
-  () => store.state.pollData.questions
+const userQuestions: ComputedRef<IQuestion[]> = computed(
+  () => store.state.pollData.userQuestions
 );
 
 onMounted(() => {
-  initCytoscapeGraph(questions.value);
+  initCytoscapeGraph(userQuestions.value);
 });
 </script>
 

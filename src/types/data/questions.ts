@@ -10,23 +10,20 @@ export interface IQuestion {
   choices: IChoice[];
 }
 
-export interface IPollRow {
+export interface IPollRowStructure {
   rowId: string;
-  questionIds: number[];
-  selectedValuesIds: number[];
-  nextQuestionIds: (number | "finish")[];
+  selectValFirst: string;
+  selectOptionsFirst: string[];
+  selectValsSecond: string[];
+  selectOptionsSecond: string[];
+  selectValThird: string;
+  selectOptionsThird: string[];
 }
 
-// Объект, у которого
-// ключи - это id не заполненых до конца вопросов,
-// а значения - это массив из id недобавленных вариантов ответа для этих вопросов
-export interface ILeftQuestionsValuesIds {
-  [key: number]: number[];
-}
-
-// Объект, у которого
-// ключи - это id выбранного следующего вопроса для текущего набора ответов,
-// а значения - это массив из id выбранных вариантов ответа
-export interface INextQuestionsValuesIds {
-  [key: number]: number[];
+export interface IPollRowInfo {
+  [key: string]: {
+    rowId: string;
+    qName: string;
+    choicesArr: string[];
+  };
 }
