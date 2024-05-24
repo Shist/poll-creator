@@ -1,27 +1,27 @@
 <template>
   <div class="poll-row">
     <BaseSelect
-      :selectedValue="props.selectValFirst"
+      :selectedValue="stateFirstVal"
       :multiple="false"
       :clearable="false"
       :label="'Если'"
-      :options="selectOptionsFirst"
+      :options="stateFirstOptions"
       @change="changeSelectedValFirst"
     />
     <BaseSelect
-      :selectedValue="props.selectValsSecond"
+      :selectedValue="stateSecondVals"
       :multiple="true"
       :clearable="false"
       :label="'Ответ'"
-      :options="selectOptionsSecond"
+      :options="stateSecondOptions"
       @change="changeSelectedValsSecond"
     />
     <BaseSelect
-      :selectedValue="props.selectValThird"
+      :selectedValue="stateThirdVal"
       :multiple="false"
       :clearable="false"
       :label="'То перейти на'"
-      :options="selectOptionsThird"
+      :options="stateThirdOptions"
       @change="changeSelectedValThird"
     />
     <button class="poll-row__cross-btn">
@@ -31,32 +31,55 @@
 </template>
 
 <script lang="ts" setup>
+import { ref, ComputedRef, computed } from "vue";
+import { useStore } from "vuex";
 import BaseSelect from "@/components/base/BaseSelect.vue";
-import { IPollRowStructure } from "@/types/data/questions";
+import { IPollRowStructure, IQuestion } from "@/types/data/questions";
 import CrossIcon from "../icons/CrossIcon.vue";
 
 const props = defineProps<Omit<IPollRowStructure, "rowId">>();
 
-const changeSelectedValFirst = (newValue: string) => {
-  // selectedValFirst.value = newValue;
+const stateFirstVal = ref(props.selectValFirst);
+const stateFirstOptions = ref(props.selectOptionsFirst);
+const stateSecondVals = ref(props.selectValsSecond);
+const stateSecondOptions = ref(props.selectOptionsSecond);
+const stateThirdVal = ref(props.selectValThird);
+const stateThirdOptions = ref(props.selectOptionsThird);
 
-  // const newQuestion = questions.value.find((question) => {
-  //   if (question.name === newValue) {
-  //     return question;
-  //   }
-  // });
-  // selectedQuestion.value = newQuestion ? newQuestion : null;
+const store = useStore();
+const userQuestions: ComputedRef<IQuestion[]> = computed(
+  () => store.state.pollData.userQuestions
+);
 
-  changeSelectedValsSecond([]);
-  changeSelectedValThird("");
+const changeSelectedValFirst = (oldValue: string, newValue: string) => {
+  stateFirstVal.value = newValue;
+
+  const freeChoicesInfo: { [key: number]: number[] } =
+    store.getters.getFreeQuestionsChoices;
+  const filteredChoicesEntries = Object.entries(freeChoicesInfo).filter(
+    ([questionId, choicesArr]) => choicesArr.length
+  );
+  const oldQuestion = userQuestions.value.find((question) => {
+    if (question.name === oldValue) {
+      return question;
+    }
+  });
+  if (oldQuestion) {
+    oldQuestion.choices.forEach((choice) => {
+      choice;
+    });
+  }
+
+  changeSelectedValsSecond(stateSecondVals.value, []);
+  changeSelectedValThird(stateThirdVal.value, "");
 };
 
-const changeSelectedValsSecond = (newValue: string[]) => {
-  //selectedValsSecond.value = newValue;
+const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
+  stateSecondVals.value = newValue;
 };
 
-const changeSelectedValThird = (newValue: string) => {
-  //selectedValThird.value = newValue;
+const changeSelectedValThird = (oldValue: string, newValue: string) => {
+  stateThirdVal.value = newValue;
 };
 </script>
 

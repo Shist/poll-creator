@@ -18,11 +18,13 @@
 <script lang="ts" setup>
 import type { BaseSelectProps } from "@/types/props";
 
-defineProps<BaseSelectProps<any>>();
-const emit = defineEmits<{ change: [value: string | string[]] }>();
+const props = defineProps<BaseSelectProps<any>>();
+const emit = defineEmits<{
+  change: [oldValue: string | string[], newValue: string | string[]];
+}>();
 
 const inputValue = (newValue: string | string[]): void => {
-  emit("change", newValue);
+  emit("change", props.selectedValue, newValue);
 };
 </script>
 

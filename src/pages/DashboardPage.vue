@@ -47,8 +47,8 @@ onMounted(() => {
   store.commit("pollData/setServerQuestions", questionsFromServer);
   store.commit("pollData/setUserQuestions", questionsFromServer);
   store.commit(
-    "pollData/setPollRows",
-    store.getters["pollData/getPollRowsStructure"]("init")
+    "pollData/setInitPollRows",
+    store.getters["pollData/initPollRowsStructure"]
   );
 });
 </script>
