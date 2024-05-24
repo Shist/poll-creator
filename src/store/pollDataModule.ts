@@ -51,8 +51,14 @@ const pollDataModule = defineModule({
         (choicesIdsArr: number[]) => !choicesIdsArr.length
       );
     },
-    getPollRowsStructure: (state) => (type: "init" | "current") => {
+    getPollRowsStructure: (state, getters) => (type: "init" | "current") => {
       const result: IPollRowStructure[] = [];
+
+      const freeChoicesInfo: { [key: number]: number[] } =
+        getters.getFreeQuestionsChoices;
+      const filteredChoicesEntries = Object.entries(freeChoicesInfo).filter(
+        ([questionId, choicesArr]) => choicesArr.length
+      );
 
       if (type === "init") {
         const qArr = state.serverQuestions;
@@ -81,12 +87,31 @@ const pollDataModule = defineModule({
 
           Object.entries(mapNextQuestionsChoices).forEach(
             ([nextQuestionIdStr, rowInfoObj]) => {
+              const firstOptionsList = filteredChoicesEntries.map(
+                ([questionId, choicesArr]) => {
+                  return qArr.find(
+                    (question) => question.id === Number(questionId)
+                  )?.name;
+                }
+              );
+              const currChoicesQuestion = filteredChoicesEntries.find(
+                ([filteredQuestionId, choicesArr]) =>
+                  Number(filteredQuestionId) === q.id
+              );
+              const secondOptionsList = currChoicesQuestion
+                ? q.choices
+                    .filter((choice) =>
+                      currChoicesQuestion[1].includes(choice.id)
+                    )
+                    .map((choice) => choice.value)
+                : [];
+
               const nextPollRow: IPollRowStructure = {
                 rowId: rowInfoObj.rowId,
                 selectValFirst: rowInfoObj.qName,
-                selectOptionsFirst: [],
+                selectOptionsFirst: firstOptionsList,
                 selectValsSecond: rowInfoObj.choicesArr,
-                selectOptionsSecond: [],
+                selectOptionsSecond: secondOptionsList,
                 selectValThird:
                   nextQuestionIdStr === "null"
                     ? "Завершено"
