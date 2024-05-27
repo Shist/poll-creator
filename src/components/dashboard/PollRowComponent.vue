@@ -112,6 +112,7 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
       )?.value;
     }
   );
+  updatedPollRows[currPollRowIndex].selectValsSecond = [];
   updatedPollRows[currPollRowIndex].selectOptionsSecond =
     currQuestionFreeChoices;
 
