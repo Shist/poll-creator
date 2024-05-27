@@ -46,6 +46,7 @@ const pollDataModule = defineModule({
         }
       }
 
+      console.log(freeChoices);
       return freeChoices;
     },
     areAllChoicesPresent(state, getters): boolean {

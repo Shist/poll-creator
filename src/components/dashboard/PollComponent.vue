@@ -111,6 +111,21 @@ const removePollRow = (currRow: IPollRowStructure) => {
     (pollRow) => pollRow.rowId !== currRow.rowId
   );
 
+  const allFreeChoices: { [key: number]: number[] } =
+    store.getters["pollData/getFreeQuestionsChoices"];
+  const questionsWithFreeChoices = Object.entries(allFreeChoices)
+    .filter(([questionId, freeChoicesIds]) => {
+      return freeChoicesIds.length > 0;
+    })
+    .map(([questionId, freeChoicesIds]) => {
+      return newUserQuestions.find(
+        (question) => question.id === Number(questionId)
+      ).name;
+    });
+  updatedPollRows.forEach((pollRow) => {
+    pollRow.selectOptionsFirst = questionsWithFreeChoices;
+  });
+
   store.commit("pollData/setPollRows", updatedPollRows);
 };
 </script>
