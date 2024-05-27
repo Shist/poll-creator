@@ -28,12 +28,15 @@
 import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
-import { IPollRowStructure } from "@/types/data/questions";
+import { IPollRowStructure, IQuestion } from "@/types/data/questions";
 import { v4 as uuidv4 } from "uuid";
 
 const store = useStore();
 const pollRows: ComputedRef<IPollRowStructure[]> = computed(
   () => store.state.pollData.pollRows
+);
+const userQuestions: ComputedRef<IQuestion[]> = computed(
+  () => store.state.pollData.userQuestions
 );
 
 const handlePollRowsUpdate = (updatedPollRows: IPollRowStructure[]) => {
@@ -41,15 +44,49 @@ const handlePollRowsUpdate = (updatedPollRows: IPollRowStructure[]) => {
 };
 
 const addPollRow = () => {
-  // const updatedPollRows = [...pollRows.value];
-  // const newPollRow: IPollRowStructure = {
-  // rowId: `${q.id}|${uuidv4()}`;
-  // selectValFirst: string;
-  // selectOptionsFirst: string[];
-  // selectValsSecond: string[];
-  // selectOptionsSecond: string[];
-  // selectValThird: string;
-  // selectOptionsThird: string[];
+  const updatedPollRows = [...pollRows.value];
+
+  const allFreeChoices: { [key: number]: number[] } =
+    store.getters["pollData/getFreeQuestionsChoices"];
+  const questionsIdsWithFreeChoices = Object.entries(allFreeChoices)
+    .filter(([questionId, freeChoicesIds]) => {
+      return freeChoicesIds.length > 0;
+    })
+    .map(([questionId, freeChoicesIds]) => {
+      return Number(questionId);
+    });
+  const questionsWithFreeChoices = questionsIdsWithFreeChoices.map(
+    (questionId) => {
+      return userQuestions.value.find((question) => question.id === questionId)
+        .name;
+    }
+  );
+  const currQuestion = userQuestions.value.find(
+    (question) => question.id === questionsIdsWithFreeChoices[0]
+  );
+  const questionChoices = allFreeChoices[questionsIdsWithFreeChoices[0]].map(
+    (choiceId) => {
+      const currChoice = currQuestion.choices.find(
+        (choice) => choice.id === choiceId
+      );
+      return currChoice.value;
+    }
+  );
+  const nextQuestionsList = userQuestions.value.map((q) => q.name);
+  nextQuestionsList.push("Завершено");
+
+  const newPollRow: IPollRowStructure = {
+    rowId: `${questionsIdsWithFreeChoices[0]}|${uuidv4()}`,
+    selectValFirst: questionsWithFreeChoices[0],
+    selectOptionsFirst: questionsWithFreeChoices,
+    selectValsSecond: [],
+    selectOptionsSecond: questionChoices,
+    selectValThird: "Завершено",
+    selectOptionsThird: nextQuestionsList,
+  };
+
+  updatedPollRows.push(newPollRow);
+  store.commit("pollData/setPollRows", updatedPollRows);
 };
 </script>
 
