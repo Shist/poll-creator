@@ -7,7 +7,7 @@
     </p>
     <div class="poll-wrapper__poll-rows-wrapper">
       <PollRowComponent
-        v-for="pollRow in initPollRows"
+        v-for="pollRow in pollRows"
         :key="pollRow.rowId"
         :selectValFirst="pollRow.selectValFirst"
         :selectOptionsFirst="pollRow.selectOptionsFirst"
@@ -34,8 +34,8 @@ import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
 import { IPollRowStructure } from "@/types/data/questions";
 
 const store = useStore();
-const initPollRows: ComputedRef<IPollRowStructure[]> = computed(
-  () => store.state.pollData.initPollRows
+const pollRows: ComputedRef<IPollRowStructure[]> = computed(
+  () => store.state.pollData.pollRows
 );
 
 const addPollRow = () => {

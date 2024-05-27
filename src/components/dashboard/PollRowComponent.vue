@@ -54,32 +54,87 @@ const userQuestions: ComputedRef<IQuestion[]> = computed(
 const changeSelectedValFirst = (oldValue: string, newValue: string) => {
   stateFirstVal.value = newValue;
 
-  const freeChoicesInfo: { [key: number]: number[] } =
-    store.getters.getFreeQuestionsChoices;
-  const filteredChoicesEntries = Object.entries(freeChoicesInfo).filter(
-    ([questionId, choicesArr]) => choicesArr.length
-  );
-  const oldQuestion = userQuestions.value.find((question) => {
+  const newUserQuestions = [...userQuestions.value];
+  const oldQuestion = newUserQuestions.find((question) => {
     if (question.name === oldValue) {
       return question;
     }
   });
+
   if (oldQuestion) {
     oldQuestion.choices.forEach((choice) => {
-      choice;
+      delete choice.next_question;
     });
   }
 
   changeSelectedValsSecond(stateSecondVals.value, []);
   changeSelectedValThird(stateThirdVal.value, "");
+
+  store.commit("pollData/setUserQuestions", newUserQuestions);
 };
 
 const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
   stateSecondVals.value = newValue;
+
+  const newUserQuestions = [...userQuestions.value];
+  const currQuestion = newUserQuestions.find((question) => {
+    if (question.name === stateFirstVal.value) {
+      return question;
+    }
+  });
+
+  if (!currQuestion) {
+    return;
+  }
+
+  const nextQuestionId = newUserQuestions.find(
+    (question) => question.name === stateThirdVal.value
+  )?.id;
+
+  currQuestion.choices.forEach((choice) => {
+    oldValue.forEach((oldChoice) => {
+      if (choice.value === oldChoice) {
+        delete choice.next_question;
+      }
+    });
+
+    if (nextQuestionId) {
+      newValue.forEach((newChoice) => {
+        if (choice.value === newChoice) {
+          choice.next_question = nextQuestionId;
+        }
+      });
+    }
+  });
+
+  store.commit("pollData/setUserQuestions", newUserQuestions);
 };
 
 const changeSelectedValThird = (oldValue: string, newValue: string) => {
   stateThirdVal.value = newValue;
+
+  const newUserQuestions = [...userQuestions.value];
+  const currQuestion = newUserQuestions.find((question) => {
+    if (question.name === stateFirstVal.value) {
+      return question;
+    }
+  });
+
+  if (!currQuestion) {
+    return;
+  }
+
+  const nextQuestionId = newUserQuestions.find(
+    (question) => question.name === newValue
+  )?.id;
+
+  currQuestion.choices.forEach((choice) => {
+    if (nextQuestionId) {
+      choice.next_question = nextQuestionId;
+    }
+  });
+
+  store.commit("pollData/setUserQuestions", newUserQuestions);
 };
 </script>
 

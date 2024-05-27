@@ -8,14 +8,14 @@ import {
 export interface IThemeState {
   serverQuestions: IQuestion[];
   userQuestions: IQuestion[];
-  initPollRows: IPollRowStructure[];
+  pollRows: IPollRowStructure[];
 }
 
 const pollDataModule = defineModule({
   state: (): IThemeState => ({
     serverQuestions: [],
     userQuestions: [],
-    initPollRows: [],
+    pollRows: [],
   }),
   getters: {
     getFreeQuestionsChoices(state): { [key: number]: number[] } {
@@ -27,20 +27,21 @@ const pollDataModule = defineModule({
 
       for (const userQuestion of state.userQuestions) {
         const userChoicesSet = new Set(
-          userQuestion.choices.map((choice) => choice.id)
+          userQuestion.choices
+            .filter((choice) => "next_question" in choice)
+            .map((choice) => choice.id)
         );
 
         const serverQuestion = state.serverQuestions.find(
-          (uq) => uq.id === userQuestion.id
+          (serverQuestion) => serverQuestion.id === userQuestion.id
         );
 
         if (serverQuestion) {
           serverQuestion.choices.forEach((serverChoice) => {
             if (!userChoicesSet.has(serverChoice.id)) {
-              freeChoices[serverChoice.id].push(serverChoice.id);
+              freeChoices[serverQuestion.id].push(serverChoice.id);
             }
           });
-          continue;
         }
       }
 
@@ -133,8 +134,8 @@ const pollDataModule = defineModule({
     setUserQuestions(state, userQuestions: IQuestion[]) {
       state.userQuestions = userQuestions;
     },
-    setInitPollRows(state, initPollRows: IPollRowStructure[]) {
-      state.initPollRows = initPollRows;
+    setPollRows(state, pollRows: IPollRowStructure[]) {
+      state.pollRows = pollRows;
     },
   },
   actions: {},
