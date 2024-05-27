@@ -4,6 +4,7 @@ import {
   IPollRowStructure,
   IPollRowInfo,
 } from "@/types/data/questions";
+import { IFreeChoices } from "@/types/data/questions";
 import { v4 as uuidv4 } from "uuid";
 
 export interface IThemeState {
@@ -19,8 +20,9 @@ const pollDataModule = defineModule({
     pollRows: [],
   }),
   getters: {
-    getFreeQuestionsChoices(state): { [key: number]: number[] } {
-      const freeChoices: { [key: number]: number[] } = {};
+    // returns an object, keys - questions IDs, values - arrays of IDs of free choices
+    freeQuestionsChoices(state): IFreeChoices {
+      const freeChoices: IFreeChoices = {};
 
       for (const serverQuestion of state.serverQuestions) {
         freeChoices[serverQuestion.id] = [];
@@ -46,26 +48,29 @@ const pollDataModule = defineModule({
         }
       }
 
-      console.log(freeChoices);
       return freeChoices;
     },
+    // Returns true if all choices of all questions are used, otherwise - false
     areAllChoicesPresent(state, getters): boolean {
-      return Object.values(getters.getFreeQuestionsChoices).every(
+      return Object.values(getters.freeQuestionsChoices).every(
         (choicesIdsArr: number[]) => !choicesIdsArr.length
       );
     },
+    // Returns init structure of poll rows based on the data from server
     initPollRowsStructure(state): IPollRowStructure[] {
       const result: IPollRowStructure[] = [];
 
-      const qArr = state.serverQuestions;
+      const serverQuestions = state.serverQuestions;
 
-      const nextQuestionsList = qArr.map((q) => q.name);
+      const nextQuestionsList = serverQuestions.map(
+        (question) => question.name
+      );
       nextQuestionsList.push("Завершено");
 
-      qArr.forEach((q) => {
+      serverQuestions.forEach((question) => {
         const mapNextQuestionsChoices: IPollRowInfo = {};
 
-        q.choices.forEach((qChoice) => {
+        question.choices.forEach((qChoice) => {
           const nextQuestionIdStr = String(qChoice.next_question);
 
           if (mapNextQuestionsChoices[nextQuestionIdStr]) {
@@ -74,8 +79,8 @@ const pollDataModule = defineModule({
             );
           } else {
             mapNextQuestionsChoices[nextQuestionIdStr] = {
-              rowId: `${q.id}|${uuidv4()}`,
-              qName: q.name,
+              rowId: `${question.id}|${uuidv4()}`,
+              qName: question.name,
               choicesArr: [qChoice.value],
             };
           }
@@ -92,7 +97,9 @@ const pollDataModule = defineModule({
               selectValThird:
                 nextQuestionIdStr === "null"
                   ? "Завершено"
-                  : qArr.find((q) => q.id === Number(nextQuestionIdStr))?.name,
+                  : serverQuestions.find(
+                      (q) => q.id === Number(nextQuestionIdStr)
+                    )?.name,
               selectOptionsThird: nextQuestionsList,
             };
 

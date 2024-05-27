@@ -29,7 +29,11 @@
 import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
-import { IPollRowStructure, IQuestion } from "@/types/data/questions";
+import {
+  IPollRowStructure,
+  IQuestion,
+  IFreeChoices,
+} from "@/types/data/questions";
 import { v4 as uuidv4 } from "uuid";
 
 const store = useStore();
@@ -47,8 +51,8 @@ const handlePollRowsUpdate = (updatedPollRows: IPollRowStructure[]) => {
 const addPollRow = () => {
   const updatedPollRows = [...pollRows.value];
 
-  const allFreeChoices: { [key: number]: number[] } =
-    store.getters["pollData/getFreeQuestionsChoices"];
+  const allFreeChoices: IFreeChoices =
+    store.getters["pollData/freeQuestionsChoices"];
   const questionsIdsWithFreeChoices = Object.entries(allFreeChoices)
     .filter(([questionId, freeChoicesIds]) => {
       return freeChoicesIds.length > 0;
@@ -111,8 +115,8 @@ const removePollRow = (currRow: IPollRowStructure) => {
     (pollRow) => pollRow.rowId !== currRow.rowId
   );
 
-  const allFreeChoices: { [key: number]: number[] } =
-    store.getters["pollData/getFreeQuestionsChoices"];
+  const allFreeChoices: IFreeChoices =
+    store.getters["pollData/freeQuestionsChoices"];
   const questionsWithFreeChoices = Object.entries(allFreeChoices)
     .filter(([questionId, freeChoicesIds]) => {
       return freeChoicesIds.length > 0;

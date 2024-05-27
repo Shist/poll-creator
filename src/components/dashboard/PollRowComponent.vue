@@ -37,7 +37,11 @@
 import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import BaseSelect from "@/components/base/BaseSelect.vue";
-import { IPollRowStructure, IQuestion } from "@/types/data/questions";
+import {
+  IPollRowStructure,
+  IQuestion,
+  IFreeChoices,
+} from "@/types/data/questions";
 import CrossIcon from "../icons/CrossIcon.vue";
 import { v4 as uuidv4 } from "uuid";
 
@@ -97,8 +101,8 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
     newUserQuestions[currQuestionIndex].id
   }|${uuidv4()}`;
 
-  const allFreeChoices: { [key: number]: number[] } =
-    store.getters["pollData/getFreeQuestionsChoices"];
+  const allFreeChoices: IFreeChoices =
+    store.getters["pollData/freeQuestionsChoices"];
   const currQuestionFreeChoicesIds =
     allFreeChoices[newUserQuestions[currQuestionIndex].id];
   const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
@@ -164,8 +168,8 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
 
   updatedPollRows[currPollRowIndex].selectValsSecond = newValue;
 
-  const allFreeChoices: { [key: number]: number[] } =
-    store.getters["pollData/getFreeQuestionsChoices"];
+  const allFreeChoices: IFreeChoices =
+    store.getters["pollData/freeQuestionsChoices"];
   const questionsWithFreeChoices = Object.entries(allFreeChoices)
     .filter(([questionId, freeChoicesIds]) => {
       return freeChoicesIds.length > 0;
