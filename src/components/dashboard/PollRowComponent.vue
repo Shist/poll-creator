@@ -92,7 +92,7 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
   });
 
   updatedPollRows.forEach((pollRow) => {
-    if (pollRow.rowId.split("-")[0] === currQuestion.id.toString()) {
+    if (pollRow.rowId.split("|")[0] === currQuestion.id.toString()) {
       pollRow.selectOptionsFirst = freeChoicesValues;
     }
   });
@@ -164,7 +164,7 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
 
   updatedPollRows.forEach((pollRow) => {
     if (
-      pollRow.rowId.split("-")[0] ===
+      pollRow.rowId.split("|")[0] ===
       newUserQuestions[currQuestionIndex].id.toString()
     ) {
       pollRow.selectOptionsSecond = freeChoicesValues;

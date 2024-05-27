@@ -4,6 +4,7 @@ import {
   IPollRowStructure,
   IPollRowInfo,
 } from "@/types/data/questions";
+import { v4 as uuidv4 } from "uuid";
 
 export interface IThemeState {
   serverQuestions: IQuestion[];
@@ -60,10 +61,10 @@ const pollDataModule = defineModule({
       const nextQuestionsList = qArr.map((q) => q.name);
       nextQuestionsList.push("Завершено");
 
-      qArr.forEach((q, qIndex) => {
+      qArr.forEach((q) => {
         const mapNextQuestionsChoices: IPollRowInfo = {};
 
-        q.choices.forEach((qChoice, qChoiceIndex) => {
+        q.choices.forEach((qChoice) => {
           const nextQuestionIdStr = String(qChoice.next_question);
 
           if (mapNextQuestionsChoices[nextQuestionIdStr]) {
@@ -72,7 +73,7 @@ const pollDataModule = defineModule({
             );
           } else {
             mapNextQuestionsChoices[nextQuestionIdStr] = {
-              rowId: `${qIndex}-${qChoiceIndex}`,
+              rowId: `${q.id}|${uuidv4()}`,
               qName: q.name,
               choicesArr: [qChoice.value],
             };
