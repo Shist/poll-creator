@@ -9,6 +9,7 @@
       <PollRowComponent
         v-for="pollRow in pollRows"
         :key="pollRow.rowId"
+        :rowId="pollRow.rowId"
         :selectValFirst="pollRow.selectValFirst"
         :selectOptionsFirst="pollRow.selectOptionsFirst"
         :selectValsSecond="pollRow.selectValsSecond"

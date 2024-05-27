@@ -37,7 +37,7 @@ import BaseSelect from "@/components/base/BaseSelect.vue";
 import { IPollRowStructure, IQuestion } from "@/types/data/questions";
 import CrossIcon from "../icons/CrossIcon.vue";
 
-const props = defineProps<Omit<IPollRowStructure, "rowId">>();
+const props = defineProps<IPollRowStructure>();
 
 const stateFirstVal = ref(props.selectValFirst);
 const stateFirstOptions = ref(props.selectOptionsFirst);
@@ -50,10 +50,11 @@ const store = useStore();
 const userQuestions: ComputedRef<IQuestion[]> = computed(
   () => store.state.pollData.userQuestions
 );
+const pollRows: ComputedRef<IPollRowStructure[]> = computed(
+  () => store.state.pollData.pollRows
+);
 
 const changeSelectedValFirst = (oldValue: string, newValue: string) => {
-  stateFirstVal.value = newValue;
-
   const newUserQuestions = [...userQuestions.value];
   const oldQuestion = newUserQuestions.find((question) => {
     if (question.name === oldValue) {
@@ -67,15 +68,30 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
     });
   }
 
+  store.commit("pollData/setUserQuestions", newUserQuestions);
+
+  const newPollRows = [...pollRows.value];
+  const currPollRow = newPollRows.find((pollRow) => {
+    if (pollRow.rowId === props.rowId) {
+      return pollRow;
+    }
+  });
+
+  currPollRow.selectValFirst = newValue;
+
+  currPollRow.selectOptionsFirst.map((option) => {
+    if (option === newValue) {
+      option = oldValue;
+    }
+  });
+
   changeSelectedValsSecond(stateSecondVals.value, []);
   changeSelectedValThird(stateThirdVal.value, "");
 
-  store.commit("pollData/setUserQuestions", newUserQuestions);
+  store.commit("pollData/setPollRows", newPollRows);
 };
 
 const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
-  stateSecondVals.value = newValue;
-
   const newUserQuestions = [...userQuestions.value];
   const currQuestion = newUserQuestions.find((question) => {
     if (question.name === stateFirstVal.value) {
@@ -108,11 +124,20 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
   });
 
   store.commit("pollData/setUserQuestions", newUserQuestions);
+
+  const newPollRows = [...pollRows.value];
+  const currPollRow = newPollRows.find((pollRow) => {
+    if (pollRow.rowId === props.rowId) {
+      return pollRow;
+    }
+  });
+
+  currPollRow.selectOptionsSecond = newValue;
+
+  store.commit("pollData/setPollRows", newPollRows);
 };
 
 const changeSelectedValThird = (oldValue: string, newValue: string) => {
-  stateThirdVal.value = newValue;
-
   const newUserQuestions = [...userQuestions.value];
   const currQuestion = newUserQuestions.find((question) => {
     if (question.name === stateFirstVal.value) {
@@ -135,6 +160,17 @@ const changeSelectedValThird = (oldValue: string, newValue: string) => {
   });
 
   store.commit("pollData/setUserQuestions", newUserQuestions);
+
+  const newPollRows = [...pollRows.value];
+  const currPollRow = newPollRows.find((pollRow) => {
+    if (pollRow.rowId === props.rowId) {
+      return pollRow;
+    }
+  });
+
+  currPollRow.selectValThird = newValue;
+
+  store.commit("pollData/setPollRows", newPollRows);
 };
 </script>
 
