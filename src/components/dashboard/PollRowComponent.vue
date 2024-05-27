@@ -60,9 +60,6 @@ const userQuestions: ComputedRef<IQuestion[]> = computed(
 );
 
 const changeSelectedValFirst = (oldValue: string, newValue: string) => {
-  changeSelectedValThird(currRow.value.selectValThird, "Завершено");
-  changeSelectedValsSecond(currRow.value.selectValsSecond, []);
-
   const newUserQuestions = [...userQuestions.value];
   const oldQuestionIndex = newUserQuestions.findIndex((question) => {
     if (question.name === oldValue) {
@@ -77,7 +74,9 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
 
   if (oldQuestionIndex !== -1) {
     newUserQuestions[oldQuestionIndex].choices.forEach((choice) => {
-      delete choice.next_question;
+      if (currRow.value.selectValsSecond.includes(choice.value)) {
+        delete choice.next_question;
+      }
     });
   }
 
