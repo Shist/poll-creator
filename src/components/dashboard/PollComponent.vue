@@ -10,6 +10,8 @@
         v-for="pollRow in pollRows"
         :key="pollRow.rowId"
         :rowId="pollRow.rowId"
+        :userQuestions="userQuestions"
+        @updateUserQuestions="handleUserQuestionsUpdate"
         :pollRows="pollRows"
         @updatePollRows="handlePollRowsUpdate"
         @removePollRow="removePollRow"
@@ -37,12 +39,16 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 const store = useStore();
-const pollRows: ComputedRef<IPollRowStructure[]> = computed(
-  () => store.state.pollData.pollRows
-);
 const userQuestions: ComputedRef<IQuestion[]> = computed(
   () => store.state.pollData.userQuestions
 );
+const pollRows: ComputedRef<IPollRowStructure[]> = computed(
+  () => store.state.pollData.pollRows
+);
+
+const handleUserQuestionsUpdate = (updatedUserQuestions: IQuestion[]) => {
+  store.commit("pollData/setUserQuestions", updatedUserQuestions);
+};
 
 const handlePollRowsUpdate = (updatedPollRows: IPollRowStructure[]) => {
   store.commit("pollData/setPollRows", updatedPollRows);
