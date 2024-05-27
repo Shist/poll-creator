@@ -12,6 +12,7 @@
         :rowId="pollRow.rowId"
         :pollRows="pollRows"
         @updatePollRows="handlePollRowsUpdate"
+        @removePollRow="removePollRow"
       />
       <button
         @click="addPollRow"
@@ -86,6 +87,30 @@ const addPollRow = () => {
   };
 
   updatedPollRows.push(newPollRow);
+  store.commit("pollData/setPollRows", updatedPollRows);
+};
+
+const removePollRow = (currRow: IPollRowStructure) => {
+  const newUserQuestions = [...userQuestions.value];
+  const questionIndex = newUserQuestions.findIndex((question) => {
+    if (question.name === currRow.selectValFirst) {
+      return question;
+    }
+  });
+
+  if (questionIndex !== -1) {
+    newUserQuestions[questionIndex].choices.forEach((choice) => {
+      delete choice.next_question;
+    });
+  }
+
+  store.commit("pollData/setUserQuestions", newUserQuestions);
+
+  const pollRowsCopy = [...pollRows.value];
+  const updatedPollRows = pollRowsCopy.filter(
+    (pollRow) => pollRow.rowId !== currRow.rowId
+  );
+
   store.commit("pollData/setPollRows", updatedPollRows);
 };
 </script>

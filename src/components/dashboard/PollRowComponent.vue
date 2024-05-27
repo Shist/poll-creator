@@ -24,7 +24,10 @@
       :options="currRow.selectOptionsThird"
       @change="changeSelectedValThird"
     />
-    <button class="poll-row__cross-btn">
+    <button
+      class="poll-row__cross-btn"
+      @click="$emit('removePollRow', currRow)"
+    >
       <CrossIcon class="poll-row__cross-btn-icon" />
     </button>
   </div>
@@ -39,7 +42,10 @@ import CrossIcon from "../icons/CrossIcon.vue";
 import { v4 as uuidv4 } from "uuid";
 
 const props = defineProps<{ rowId: string; pollRows: IPollRowStructure[] }>();
-const emit = defineEmits(["updatePollRows"]);
+const emit = defineEmits<{
+  updatePollRows: [value: IPollRowStructure[]];
+  removePollRow: [value: IPollRowStructure];
+}>();
 
 const currRow = computed<IPollRowStructure>(() => {
   return props.pollRows.find(
