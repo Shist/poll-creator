@@ -41,6 +41,7 @@ const props = defineProps<IPollRowStructure>();
 
 const stateFirstVal = ref(props.selectValFirst);
 const stateFirstOptions = ref(props.selectOptionsFirst);
+console.log(props.selectValsSecond);
 const stateSecondVals = ref(props.selectValsSecond);
 const stateSecondOptions = ref(props.selectOptionsSecond);
 const stateThirdVal = ref(props.selectValThird);
@@ -56,14 +57,19 @@ const pollRows: ComputedRef<IPollRowStructure[]> = computed(
 
 const changeSelectedValFirst = (oldValue: string, newValue: string) => {
   const newUserQuestions = [...userQuestions.value];
-  const oldQuestion = newUserQuestions.find((question) => {
+  const oldQuestionIndex = newUserQuestions.findIndex((question) => {
     if (question.name === oldValue) {
       return question;
     }
   });
+  const currQuestion = newUserQuestions.find((question) => {
+    if (question.name === newValue) {
+      return question;
+    }
+  });
 
-  if (oldQuestion) {
-    oldQuestion.choices.forEach((choice) => {
+  if (oldQuestionIndex !== -1) {
+    newUserQuestions[oldQuestionIndex].choices.forEach((choice) => {
       delete choice.next_question;
     });
   }
@@ -71,43 +77,52 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
   store.commit("pollData/setUserQuestions", newUserQuestions);
 
   const newPollRows = [...pollRows.value];
-  const currPollRow = newPollRows.find((pollRow) => {
+  const currPollRowIndex = newPollRows.findIndex((pollRow) => {
     if (pollRow.rowId === props.rowId) {
       return pollRow;
     }
   });
 
-  currPollRow.selectValFirst = newValue;
+  newPollRows[currPollRowIndex].selectValFirst = newValue;
 
-  currPollRow.selectOptionsFirst.map((option) => {
-    if (option === newValue) {
-      option = oldValue;
+  const allFreeChoices = store.getters["pollData/getFreeQuestionsChoices"];
+  const currQuestionFreeChoices = allFreeChoices[currQuestion.id];
+  const freeChoicesValues = currQuestionFreeChoices.map((choiceId: number) => {
+    return currQuestion.choices.find((choice) => choice.id === choiceId)?.value;
+  });
+
+  newPollRows.forEach((pollRow) => {
+    if (pollRow.rowId.split("-")[0] === currQuestion.id.toString()) {
+      pollRow.selectOptionsFirst = freeChoicesValues;
     }
   });
 
+  store.commit("pollData/setPollRows", newPollRows);
+
   changeSelectedValsSecond(stateSecondVals.value, []);
   changeSelectedValThird(stateThirdVal.value, "");
-
-  store.commit("pollData/setPollRows", newPollRows);
 };
 
 const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
   const newUserQuestions = [...userQuestions.value];
-  const currQuestion = newUserQuestions.find((question) => {
+  const currQuestionIndex = newUserQuestions.findIndex((question) => {
     if (question.name === stateFirstVal.value) {
       return question;
     }
   });
 
-  if (!currQuestion) {
+  if (currQuestionIndex === -1) {
     return;
   }
 
-  const nextQuestionId = newUserQuestions.find(
-    (question) => question.name === stateThirdVal.value
-  )?.id;
+  const nextQuestionId =
+    stateThirdVal.value !== "Завершено"
+      ? newUserQuestions.find(
+          (question) => question.name === stateThirdVal.value
+        )?.id
+      : "Завершено";
 
-  currQuestion.choices.forEach((choice) => {
+  newUserQuestions[currQuestionIndex].choices.forEach((choice) => {
     oldValue.forEach((oldChoice) => {
       if (choice.value === oldChoice) {
         delete choice.next_question;
@@ -117,7 +132,8 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
     if (nextQuestionId) {
       newValue.forEach((newChoice) => {
         if (choice.value === newChoice) {
-          choice.next_question = nextQuestionId;
+          choice.next_question =
+            nextQuestionId !== "Завершено" ? nextQuestionId : null;
         }
       });
     }
@@ -126,26 +142,44 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
   store.commit("pollData/setUserQuestions", newUserQuestions);
 
   const newPollRows = [...pollRows.value];
-  const currPollRow = newPollRows.find((pollRow) => {
+  const currPollRowIndex = newPollRows.findIndex((pollRow) => {
     if (pollRow.rowId === props.rowId) {
       return pollRow;
     }
   });
 
-  currPollRow.selectOptionsSecond = newValue;
+  newPollRows[currPollRowIndex].selectValsSecond = newValue;
+
+  const allFreeChoices = store.getters["pollData/getFreeQuestionsChoices"];
+  const currQuestionFreeChoices =
+    allFreeChoices[newUserQuestions[currQuestionIndex].id];
+  const freeChoicesValues = currQuestionFreeChoices.map((choiceId: number) => {
+    return newUserQuestions[currQuestionIndex].choices.find(
+      (choice) => choice.id === choiceId
+    )?.value;
+  });
+
+  newPollRows.forEach((pollRow) => {
+    if (
+      pollRow.rowId.split("-")[0] ===
+      newUserQuestions[currQuestionIndex].id.toString()
+    ) {
+      pollRow.selectOptionsSecond = freeChoicesValues;
+    }
+  });
 
   store.commit("pollData/setPollRows", newPollRows);
 };
 
 const changeSelectedValThird = (oldValue: string, newValue: string) => {
   const newUserQuestions = [...userQuestions.value];
-  const currQuestion = newUserQuestions.find((question) => {
+  const currQuestionIndex = newUserQuestions.findIndex((question) => {
     if (question.name === stateFirstVal.value) {
       return question;
     }
   });
 
-  if (!currQuestion) {
+  if (currQuestionIndex === -1) {
     return;
   }
 
@@ -153,7 +187,7 @@ const changeSelectedValThird = (oldValue: string, newValue: string) => {
     (question) => question.name === newValue
   )?.id;
 
-  currQuestion.choices.forEach((choice) => {
+  newUserQuestions[currQuestionIndex].choices.forEach((choice) => {
     if (nextQuestionId) {
       choice.next_question = nextQuestionId;
     }
@@ -162,13 +196,13 @@ const changeSelectedValThird = (oldValue: string, newValue: string) => {
   store.commit("pollData/setUserQuestions", newUserQuestions);
 
   const newPollRows = [...pollRows.value];
-  const currPollRow = newPollRows.find((pollRow) => {
+  const currPollRowIndex = newPollRows.findIndex((pollRow) => {
     if (pollRow.rowId === props.rowId) {
       return pollRow;
     }
   });
 
-  currPollRow.selectValThird = newValue;
+  newPollRows[currPollRowIndex].selectValThird = newValue;
 
   store.commit("pollData/setPollRows", newPollRows);
 };

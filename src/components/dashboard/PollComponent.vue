@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ComputedRef, computed } from "vue";
+import { ComputedRef, computed, watch } from "vue";
 import { useStore } from "vuex";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
 import { IPollRowStructure } from "@/types/data/questions";
@@ -38,6 +38,8 @@ const store = useStore();
 const pollRows: ComputedRef<IPollRowStructure[]> = computed(
   () => store.state.pollData.pollRows
 );
+
+watch(pollRows, () => console.log(pollRows.value[0].selectValsSecond));
 
 const addPollRow = () => {
   // do something
