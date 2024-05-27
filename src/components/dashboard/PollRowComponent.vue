@@ -31,11 +31,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, ComputedRef, computed } from "vue";
+import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import BaseSelect from "@/components/base/BaseSelect.vue";
 import { IPollRowStructure, IQuestion } from "@/types/data/questions";
 import CrossIcon from "../icons/CrossIcon.vue";
+import { v4 as uuidv4 } from "uuid";
 
 const props = defineProps<{ rowId: string; pollRows: IPollRowStructure[] }>();
 const emit = defineEmits(["updatePollRows"]);
@@ -59,7 +60,7 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
       return question;
     }
   });
-  const currQuestion = newUserQuestions.find((question) => {
+  const currQuestionIndex = newUserQuestions.findIndex((question) => {
     if (question.name === newValue) {
       return question;
     }
@@ -84,18 +85,9 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
   }
 
   updatedPollRows[currPollRowIndex].selectValFirst = newValue;
-
-  const allFreeChoices = store.getters["pollData/getFreeQuestionsChoices"];
-  const currQuestionFreeChoices = allFreeChoices[currQuestion.id];
-  const freeChoicesValues = currQuestionFreeChoices.map((choiceId: number) => {
-    return currQuestion.choices.find((choice) => choice.id === choiceId)?.value;
-  });
-
-  updatedPollRows.forEach((pollRow) => {
-    if (pollRow.rowId.split("|")[0] === currQuestion.id.toString()) {
-      pollRow.selectOptionsFirst = freeChoicesValues;
-    }
-  });
+  updatedPollRows[currPollRowIndex].rowId = `${
+    newUserQuestions[currQuestionIndex].id
+  }|${uuidv4()}`;
 
   emit("updatePollRows", updatedPollRows);
 
@@ -153,13 +145,29 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
 
   updatedPollRows[currPollRowIndex].selectValsSecond = newValue;
 
-  const allFreeChoices = store.getters["pollData/getFreeQuestionsChoices"];
-  const currQuestionFreeChoices =
+  const allFreeChoices: { [key: number]: number[] } =
+    store.getters["pollData/getFreeQuestionsChoices"];
+  const questionsWithFreeChoices = Object.entries(allFreeChoices)
+    .filter(([questionId, freeChoicesIds]) => {
+      return freeChoicesIds.length > 0;
+    })
+    .map(([questionId, freeChoicesIds]) => {
+      return newUserQuestions.find(
+        (question) => question.id === Number(questionId)
+      ).name;
+    });
+  const currQuestionFreeChoicesIds =
     allFreeChoices[newUserQuestions[currQuestionIndex].id];
-  const freeChoicesValues = currQuestionFreeChoices.map((choiceId: number) => {
-    return newUserQuestions[currQuestionIndex].choices.find(
-      (choice) => choice.id === choiceId
-    )?.value;
+  const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
+    (choiceId: number) => {
+      return newUserQuestions[currQuestionIndex].choices.find(
+        (choice) => choice.id === choiceId
+      )?.value;
+    }
+  );
+
+  updatedPollRows.forEach((pollRow) => {
+    pollRow.selectOptionsFirst = questionsWithFreeChoices;
   });
 
   updatedPollRows.forEach((pollRow) => {
@@ -167,7 +175,7 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
       pollRow.rowId.split("|")[0] ===
       newUserQuestions[currQuestionIndex].id.toString()
     ) {
-      pollRow.selectOptionsSecond = freeChoicesValues;
+      pollRow.selectOptionsSecond = currQuestionFreeChoices;
     }
   });
 

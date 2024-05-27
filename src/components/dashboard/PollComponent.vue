@@ -29,6 +29,7 @@ import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
 import { IPollRowStructure } from "@/types/data/questions";
+import { v4 as uuidv4 } from "uuid";
 
 const store = useStore();
 const pollRows: ComputedRef<IPollRowStructure[]> = computed(
@@ -40,7 +41,15 @@ const handlePollRowsUpdate = (updatedPollRows: IPollRowStructure[]) => {
 };
 
 const addPollRow = () => {
-  // do something
+  // const updatedPollRows = [...pollRows.value];
+  // const newPollRow: IPollRowStructure = {
+  // rowId: `${q.id}|${uuidv4()}`;
+  // selectValFirst: string;
+  // selectOptionsFirst: string[];
+  // selectValsSecond: string[];
+  // selectOptionsSecond: string[];
+  // selectValThird: string;
+  // selectOptionsThird: string[];
 };
 </script>
 
