@@ -10,12 +10,8 @@
         v-for="pollRow in pollRows"
         :key="pollRow.rowId"
         :rowId="pollRow.rowId"
-        :selectValFirst="pollRow.selectValFirst"
-        :selectOptionsFirst="pollRow.selectOptionsFirst"
-        :selectValsSecond="pollRow.selectValsSecond"
-        :selectOptionsSecond="pollRow.selectOptionsSecond"
-        :selectValThird="pollRow.selectValThird"
-        :selectOptionsThird="pollRow.selectOptionsThird"
+        :pollRows="pollRows"
+        @updatePollRows="handlePollRowsUpdate"
       />
       <button
         @click="addPollRow"
@@ -29,7 +25,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ComputedRef, computed, watch } from "vue";
+import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
 import { IPollRowStructure } from "@/types/data/questions";
@@ -39,7 +35,9 @@ const pollRows: ComputedRef<IPollRowStructure[]> = computed(
   () => store.state.pollData.pollRows
 );
 
-watch(pollRows, () => console.log(pollRows.value[0].selectValsSecond));
+const handlePollRowsUpdate = (updatedPollRows: IPollRowStructure[]) => {
+  store.commit("pollData/setPollRows", updatedPollRows);
+};
 
 const addPollRow = () => {
   // do something
