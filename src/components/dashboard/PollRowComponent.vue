@@ -60,6 +60,9 @@ const userQuestions: ComputedRef<IQuestion[]> = computed(
 );
 
 const changeSelectedValFirst = (oldValue: string, newValue: string) => {
+  changeSelectedValThird(currRow.value.selectValThird, "Завершено");
+  changeSelectedValsSecond(currRow.value.selectValsSecond, []);
+
   const newUserQuestions = [...userQuestions.value];
   const oldQuestionIndex = newUserQuestions.findIndex((question) => {
     if (question.name === oldValue) {
@@ -95,10 +98,21 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
     newUserQuestions[currQuestionIndex].id
   }|${uuidv4()}`;
 
-  emit("updatePollRows", updatedPollRows);
+  const allFreeChoices: { [key: number]: number[] } =
+    store.getters["pollData/getFreeQuestionsChoices"];
+  const currQuestionFreeChoicesIds =
+    allFreeChoices[newUserQuestions[currQuestionIndex].id];
+  const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
+    (choiceId: number) => {
+      return newUserQuestions[currQuestionIndex].choices.find(
+        (choice) => choice.id === choiceId
+      )?.value;
+    }
+  );
+  updatedPollRows[currPollRowIndex].selectOptionsSecond =
+    currQuestionFreeChoices;
 
-  changeSelectedValsSecond(currRow.value.selectValsSecond, []);
-  changeSelectedValThird(currRow.value.selectValThird, "");
+  emit("updatePollRows", updatedPollRows);
 };
 
 const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
