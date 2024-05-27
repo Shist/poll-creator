@@ -110,7 +110,9 @@ const removePollRow = (currRow: IPollRowStructure) => {
 
   if (questionIndex !== -1) {
     newUserQuestions[questionIndex].choices.forEach((choice) => {
-      delete choice.next_question;
+      if (currRow.selectValsSecond.includes(choice.value)) {
+        delete choice.next_question;
+      }
     });
   }
 
@@ -120,6 +122,11 @@ const removePollRow = (currRow: IPollRowStructure) => {
   const updatedPollRows = pollRowsCopy.filter(
     (pollRow) => pollRow.rowId !== currRow.rowId
   );
+  const currQuestionIndex = newUserQuestions.findIndex((question) => {
+    if (question.name === currRow.selectValFirst) {
+      return question;
+    }
+  });
 
   const allFreeChoices: IFreeChoices =
     store.getters["pollData/freeQuestionsChoices"];
@@ -132,8 +139,27 @@ const removePollRow = (currRow: IPollRowStructure) => {
         (question) => question.id === Number(questionId)
       ).name;
     });
+  const currQuestionFreeChoicesIds =
+    allFreeChoices[userQuestions.value[currQuestionIndex].id];
+  const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
+    (choiceId: number) => {
+      return newUserQuestions[currQuestionIndex].choices.find(
+        (choice) => choice.id === choiceId
+      )?.value;
+    }
+  );
+
   updatedPollRows.forEach((pollRow) => {
     pollRow.selectOptionsFirst = questionsWithFreeChoices;
+  });
+
+  updatedPollRows.forEach((pollRow) => {
+    if (
+      pollRow.rowId.split("|")[0] ===
+      newUserQuestions[currQuestionIndex].id.toString()
+    ) {
+      pollRow.selectOptionsSecond = currQuestionFreeChoices;
+    }
   });
 
   store.commit("pollData/setPollRows", updatedPollRows);
