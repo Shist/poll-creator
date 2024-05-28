@@ -112,6 +112,16 @@ const pollDataModule = defineModule({
 
       return result;
     },
+    // Returns the ID of the question from userQuestions by its name
+    questionIndexByName:
+      (state) =>
+      (questionName: string): number => {
+        return state.userQuestions.findIndex((question) => {
+          if (question.name === questionName) {
+            return question;
+          }
+        });
+      },
   },
   mutations: {
     setServerQuestions(state, serverQuestions: IQuestion[]) {

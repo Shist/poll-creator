@@ -104,11 +104,9 @@ const addPollRow = () => {
 
 const removePollRow = (currRow: IPollRowStructure) => {
   const newUserQuestions = [...userQuestions.value];
-  const questionIndex = newUserQuestions.findIndex((question) => {
-    if (question.name === currRow.selectValFirst) {
-      return question;
-    }
-  });
+  const questionIndex = store.getters["pollData/questionIndexByName"](
+    currRow.selectValFirst
+  );
 
   if (questionIndex === -1) {
     return;
@@ -126,15 +124,6 @@ const removePollRow = (currRow: IPollRowStructure) => {
   const updatedPollRows = pollRowsCopy.filter(
     (pollRow) => pollRow.rowId !== currRow.rowId
   );
-  const currQuestionIndex = newUserQuestions.findIndex((question) => {
-    if (question.name === currRow.selectValFirst) {
-      return question;
-    }
-  });
-
-  if (currQuestionIndex === -1) {
-    return;
-  }
 
   const allFreeChoices: IFreeChoices =
     store.getters["pollData/freeQuestionsChoices"];
@@ -148,10 +137,10 @@ const removePollRow = (currRow: IPollRowStructure) => {
       )?.name;
     });
   const currQuestionFreeChoicesIds =
-    allFreeChoices[userQuestions.value[currQuestionIndex].id];
+    allFreeChoices[userQuestions.value[questionIndex].id];
   const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
     (choiceId: number) => {
-      return newUserQuestions[currQuestionIndex].choices.find(
+      return newUserQuestions[questionIndex].choices.find(
         (choice) => choice.id === choiceId
       )?.value;
     }
@@ -164,7 +153,7 @@ const removePollRow = (currRow: IPollRowStructure) => {
   updatedPollRows.forEach((pollRow) => {
     if (
       pollRow.rowId.split("|")[0] ===
-      newUserQuestions[currQuestionIndex].id.toString()
+      newUserQuestions[questionIndex].id.toString()
     ) {
       pollRow.selectOptionsSecond = currQuestionFreeChoices;
     }
