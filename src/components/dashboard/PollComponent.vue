@@ -61,13 +61,8 @@ const addPollRow = () => {
 
   const allFreeChoices: IFreeChoices =
     store.getters["pollData/freeQuestionsChoices"];
-  const questionsIdsWithFreeChoices = Object.entries(allFreeChoices)
-    .filter(([questionId, freeChoicesIds]) => {
-      return freeChoicesIds.length;
-    })
-    .map(([questionId, freeChoicesIds]) => {
-      return Number(questionId);
-    });
+  const questionsIdsWithFreeChoices: number[] =
+    store.getters["pollData/questionsIdsWithFreeChoices"];
   const questionsWithFreeChoices: string[] =
     store.getters["pollData/questionsWithFreeChoices"];
 

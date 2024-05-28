@@ -133,8 +133,8 @@ const pollDataModule = defineModule({
           }
         });
       },
-    // Returns an array of the names of questions that have some free choices to choose
-    questionsWithFreeChoices(state, getters): string[] {
+    // Returns an array of IDs of questions that have some free choices to choose
+    questionsIdsWithFreeChoices(state, getters): number[] {
       const allFreeChoices: IFreeChoices = getters.freeQuestionsChoices;
       return Object.entries(allFreeChoices)
         .filter(([questionId, freeChoicesIds]) => {
@@ -142,12 +142,17 @@ const pollDataModule = defineModule({
         })
         .map(([questionId, freeChoicesIds]) => {
           return Number(questionId);
-        })
-        .map((questionId) => {
-          return state.userQuestions.find(
-            (question) => question.id === questionId
-          )?.name;
         });
+    },
+    // Returns an array of the names of questions that have some free choices to choose
+    questionsWithFreeChoices(state, getters): string[] {
+      const questionsIdsWithFreeChoices: number[] =
+        getters.questionsIdsWithFreeChoices;
+      return questionsIdsWithFreeChoices.map((questionId) => {
+        return state.userQuestions.find(
+          (question) => question.id === questionId
+        )?.name;
+      });
     },
   },
 
