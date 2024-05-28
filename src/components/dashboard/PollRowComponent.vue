@@ -37,11 +37,7 @@
 import { computed } from "vue";
 import { useStore } from "vuex";
 import BaseSelect from "@/components/base/BaseSelect.vue";
-import {
-  IPollRowStructure,
-  IQuestion,
-  IFreeChoices,
-} from "@/types/data/questions";
+import { IPollRowStructure, IQuestion } from "@/types/data/questions";
 import CrossIcon from "../icons/CrossIcon.vue";
 import { v4 as uuidv4 } from "uuid";
 
@@ -107,17 +103,9 @@ const changeSelectedValFirst = (newValue: string) => {
     updatedUserQuestions[currQuestionIndex].id
   }|${uuidv4()}`;
 
-  const allFreeChoices: IFreeChoices =
-    store.getters["pollData/freeQuestionsChoices"];
-  const currQuestionFreeChoicesIds =
-    allFreeChoices[updatedUserQuestions[currQuestionIndex].id];
-  const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
-    (choiceId: number) => {
-      return updatedUserQuestions[currQuestionIndex].choices.find(
-        (choice) => choice.id === choiceId
-      )?.value;
-    }
-  );
+  const currQuestionFreeChoices = store.getters[
+    "pollData/questionFreeChoicesById"
+  ](updatedUserQuestions[currQuestionIndex].id);
 
   updatedPollRows[currPollRowIndex].selectValsSecond = [];
 
@@ -172,20 +160,12 @@ const changeSelectedValsSecond = (newValue: string[]) => {
 
   updatedPollRows[currPollRowIndex].selectValsSecond = newValue;
 
-  const allFreeChoices: IFreeChoices =
-    store.getters["pollData/freeQuestionsChoices"];
   const questionsWithFreeChoices: string[] =
     store.getters["pollData/questionsWithFreeChoices"];
 
-  const currQuestionFreeChoicesIds =
-    allFreeChoices[updatedUserQuestions[currQuestionIndex].id];
-  const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
-    (choiceId: number) => {
-      return updatedUserQuestions[currQuestionIndex].choices.find(
-        (choice) => choice.id === choiceId
-      )?.value;
-    }
-  );
+  const currQuestionFreeChoices = store.getters[
+    "pollData/questionFreeChoicesById"
+  ](updatedUserQuestions[currQuestionIndex].id);
 
   updatedPollRows.forEach((pollRow) => {
     pollRow.selectOptionsFirst = questionsWithFreeChoices;

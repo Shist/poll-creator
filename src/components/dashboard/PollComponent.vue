@@ -31,11 +31,7 @@
 import { ComputedRef, computed } from "vue";
 import { useStore } from "vuex";
 import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
-import {
-  IPollRowStructure,
-  IQuestion,
-  IFreeChoices,
-} from "@/types/data/questions";
+import { IPollRowStructure, IQuestion } from "@/types/data/questions";
 import { v4 as uuidv4 } from "uuid";
 
 const store = useStore();
@@ -59,23 +55,14 @@ const handlePollRowsUpdate = (updatedPollRows: IPollRowStructure[]) => {
 const addPollRow = () => {
   const updatedPollRows = [...pollRows.value];
 
-  const allFreeChoices: IFreeChoices =
-    store.getters["pollData/freeQuestionsChoices"];
   const questionsIdsWithFreeChoices: number[] =
     store.getters["pollData/questionsIdsWithFreeChoices"];
+
   const questionsWithFreeChoices: string[] =
     store.getters["pollData/questionsWithFreeChoices"];
 
-  const currQuestion = userQuestions.value.find(
-    (question) => question.id === questionsIdsWithFreeChoices[0]
-  );
-  const questionChoices = allFreeChoices[questionsIdsWithFreeChoices[0]].map(
-    (choiceId) => {
-      const currChoice = currQuestion?.choices.find(
-        (choice) => choice.id === choiceId
-      );
-      return currChoice?.value;
-    }
+  const questionChoices = store.getters["pollData/questionFreeChoicesById"](
+    questionsIdsWithFreeChoices[0]
   );
 
   const nextQuestionsList = userQuestions.value.map(
@@ -116,25 +103,16 @@ const removePollRow = (currRow: IPollRowStructure) => {
 
   store.commit("pollData/setUserQuestions", newUserQuestions);
 
-  const pollRowsCopy = [...pollRows.value];
-  const updatedPollRows = pollRowsCopy.filter(
+  const updatedPollRows = pollRows.value.filter(
     (pollRow) => pollRow.rowId !== currRow.rowId
   );
 
-  const allFreeChoices: IFreeChoices =
-    store.getters["pollData/freeQuestionsChoices"];
   const questionsWithFreeChoices: string[] =
     store.getters["pollData/questionsWithFreeChoices"];
 
-  const currQuestionFreeChoicesIds =
-    allFreeChoices[userQuestions.value[questionIndex].id];
-  const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
-    (choiceId: number) => {
-      return newUserQuestions[questionIndex].choices.find(
-        (choice) => choice.id === choiceId
-      )?.value;
-    }
-  );
+  const currQuestionFreeChoices = store.getters[
+    "pollData/questionFreeChoicesById"
+  ](newUserQuestions[questionIndex].id);
 
   updatedPollRows.forEach((pollRow) => {
     pollRow.selectOptionsFirst = questionsWithFreeChoices;
