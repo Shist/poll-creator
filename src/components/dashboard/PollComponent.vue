@@ -39,9 +39,11 @@ import {
 import { v4 as uuidv4 } from "uuid";
 
 const store = useStore();
+
 const userQuestions: ComputedRef<IQuestion[]> = computed(
   () => store.state.pollData.userQuestions
 );
+
 const pollRows: ComputedRef<IPollRowStructure[]> = computed(
   () => store.state.pollData.pollRows
 );
@@ -72,6 +74,7 @@ const addPollRow = () => {
         ?.name;
     }
   );
+
   const currQuestion = userQuestions.value.find(
     (question) => question.id === questionsIdsWithFreeChoices[0]
   );
@@ -83,6 +86,7 @@ const addPollRow = () => {
       return currChoice?.value;
     }
   );
+
   const nextQuestionsList = userQuestions.value.map(
     (question) => question.name
   );
@@ -104,6 +108,7 @@ const addPollRow = () => {
 
 const removePollRow = (currRow: IPollRowStructure) => {
   const newUserQuestions = [...userQuestions.value];
+
   const questionIndex = store.getters["pollData/questionIndexByName"](
     currRow.selectValFirst
   );
@@ -136,6 +141,7 @@ const removePollRow = (currRow: IPollRowStructure) => {
         (question) => question.id === Number(questionId)
       )?.name;
     });
+
   const currQuestionFreeChoicesIds =
     allFreeChoices[userQuestions.value[questionIndex].id];
   const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(

@@ -19,6 +19,7 @@ const pollDataModule = defineModule({
     userQuestions: [],
     pollRows: [],
   }),
+
   getters: {
     // returns an object, keys - questions IDs, values - arrays of IDs of free choices
     freeQuestionsChoices(state): IFreeChoices {
@@ -123,6 +124,7 @@ const pollDataModule = defineModule({
         });
       },
   },
+
   mutations: {
     setServerQuestions(state, serverQuestions: IQuestion[]) {
       state.serverQuestions = serverQuestions;
@@ -134,7 +136,9 @@ const pollDataModule = defineModule({
       state.pollRows = pollRows;
     },
   },
+
   actions: {},
+
   namespaced: true,
 });
 

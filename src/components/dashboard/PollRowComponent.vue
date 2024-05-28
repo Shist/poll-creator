@@ -67,6 +67,7 @@ const store = useStore();
 
 const changeSelectedValFirst = (newValue: string) => {
   const updatedUserQuestions = [...props.userQuestions];
+
   const oldQuestionIndex = store.getters["pollData/questionIndexByName"](
     currRow.value.selectValFirst
   );
@@ -81,6 +82,7 @@ const changeSelectedValFirst = (newValue: string) => {
   if (currQuestionIndex === -1) {
     return;
   }
+
   updatedUserQuestions[oldQuestionIndex].choices.forEach((choice) => {
     if (currRow.value.selectValsSecond.includes(choice.value)) {
       delete choice.next_question;
@@ -100,6 +102,7 @@ const changeSelectedValFirst = (newValue: string) => {
   }
 
   updatedPollRows[currPollRowIndex].selectValFirst = newValue;
+
   updatedPollRows[currPollRowIndex].rowId = `${
     updatedUserQuestions[currQuestionIndex].id
   }|${uuidv4()}`;
@@ -115,7 +118,9 @@ const changeSelectedValFirst = (newValue: string) => {
       )?.value;
     }
   );
+
   updatedPollRows[currPollRowIndex].selectValsSecond = [];
+
   updatedPollRows[currPollRowIndex].selectOptionsSecond =
     currQuestionFreeChoices;
 
@@ -124,6 +129,7 @@ const changeSelectedValFirst = (newValue: string) => {
 
 const changeSelectedValsSecond = (newValue: string[]) => {
   const updatedUserQuestions = [...props.userQuestions];
+
   const currQuestionIndex = store.getters["pollData/questionIndexByName"](
     currRow.value.selectValFirst
   );
@@ -177,6 +183,7 @@ const changeSelectedValsSecond = (newValue: string[]) => {
         (question) => question.id === Number(questionId)
       )?.name;
     });
+
   const currQuestionFreeChoicesIds =
     allFreeChoices[updatedUserQuestions[currQuestionIndex].id];
   const currQuestionFreeChoices = currQuestionFreeChoicesIds.map(
@@ -205,6 +212,7 @@ const changeSelectedValsSecond = (newValue: string[]) => {
 
 const changeSelectedValThird = (newValue: string) => {
   const updatedUserQuestions = [...props.userQuestions];
+
   const currQuestionIndex = store.getters["pollData/questionIndexByName"](
     currRow.value.selectValFirst
   );
