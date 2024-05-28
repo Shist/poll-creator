@@ -133,6 +133,22 @@ const pollDataModule = defineModule({
           }
         });
       },
+    // Returns an array of the names of questions that have some free choices to choose
+    questionsWithFreeChoices(state, getters): string[] {
+      const allFreeChoices: IFreeChoices = getters.freeQuestionsChoices;
+      return Object.entries(allFreeChoices)
+        .filter(([questionId, freeChoicesIds]) => {
+          return freeChoicesIds.length;
+        })
+        .map(([questionId, freeChoicesIds]) => {
+          return Number(questionId);
+        })
+        .map((questionId) => {
+          return state.userQuestions.find(
+            (question) => question.id === questionId
+          )?.name;
+        });
+    },
   },
 
   mutations: {

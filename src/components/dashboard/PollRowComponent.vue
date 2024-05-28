@@ -68,15 +68,15 @@ const store = useStore();
 const changeSelectedValFirst = (newValue: string) => {
   const updatedUserQuestions = [...props.userQuestions];
 
-  const oldQuestionIndex = store.getters["pollData/questionIndexByName"](
-    currRow.value.selectValFirst
-  );
+  const oldQuestionIndex: number = store.getters[
+    "pollData/questionIndexByName"
+  ](currRow.value.selectValFirst);
 
   if (oldQuestionIndex === -1) {
     return;
   }
 
-  const currQuestionIndex =
+  const currQuestionIndex: number =
     store.getters["pollData/questionIndexByName"](newValue);
 
   if (currQuestionIndex === -1) {
@@ -93,7 +93,7 @@ const changeSelectedValFirst = (newValue: string) => {
 
   const updatedPollRows = [...props.pollRows];
 
-  const currPollRowIndex = store.getters["pollData/pollRowIndexByName"](
+  const currPollRowIndex: number = store.getters["pollData/pollRowIndexByName"](
     currRow.value.rowId
   );
 
@@ -130,9 +130,9 @@ const changeSelectedValFirst = (newValue: string) => {
 const changeSelectedValsSecond = (newValue: string[]) => {
   const updatedUserQuestions = [...props.userQuestions];
 
-  const currQuestionIndex = store.getters["pollData/questionIndexByName"](
-    currRow.value.selectValFirst
-  );
+  const currQuestionIndex: number = store.getters[
+    "pollData/questionIndexByName"
+  ](currRow.value.selectValFirst);
 
   if (currQuestionIndex === -1) {
     return;
@@ -162,7 +162,7 @@ const changeSelectedValsSecond = (newValue: string[]) => {
 
   const updatedPollRows = [...props.pollRows];
 
-  const currPollRowIndex = store.getters["pollData/pollRowIndexByName"](
+  const currPollRowIndex: number = store.getters["pollData/pollRowIndexByName"](
     currRow.value.rowId
   );
 
@@ -174,15 +174,8 @@ const changeSelectedValsSecond = (newValue: string[]) => {
 
   const allFreeChoices: IFreeChoices =
     store.getters["pollData/freeQuestionsChoices"];
-  const questionsWithFreeChoices = Object.entries(allFreeChoices)
-    .filter(([questionId, freeChoicesIds]) => {
-      return freeChoicesIds.length > 0;
-    })
-    .map(([questionId, freeChoicesIds]) => {
-      return updatedUserQuestions.find(
-        (question) => question.id === Number(questionId)
-      )?.name;
-    });
+  const questionsWithFreeChoices: string[] =
+    store.getters["pollData/questionsWithFreeChoices"];
 
   const currQuestionFreeChoicesIds =
     allFreeChoices[updatedUserQuestions[currQuestionIndex].id];
@@ -213,9 +206,9 @@ const changeSelectedValsSecond = (newValue: string[]) => {
 const changeSelectedValThird = (newValue: string) => {
   const updatedUserQuestions = [...props.userQuestions];
 
-  const currQuestionIndex = store.getters["pollData/questionIndexByName"](
-    currRow.value.selectValFirst
-  );
+  const currQuestionIndex: number = store.getters[
+    "pollData/questionIndexByName"
+  ](currRow.value.selectValFirst);
 
   if (currQuestionIndex === -1) {
     return;
@@ -235,7 +228,7 @@ const changeSelectedValThird = (newValue: string) => {
 
   const updatedPollRows = [...props.pollRows];
 
-  const currPollRowIndex = store.getters["pollData/pollRowIndexByName"](
+  const currPollRowIndex: number = store.getters["pollData/pollRowIndexByName"](
     currRow.value.rowId
   );
 

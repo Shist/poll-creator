@@ -68,12 +68,8 @@ const addPollRow = () => {
     .map(([questionId, freeChoicesIds]) => {
       return Number(questionId);
     });
-  const questionsWithFreeChoices = questionsIdsWithFreeChoices.map(
-    (questionId) => {
-      return userQuestions.value.find((question) => question.id === questionId)
-        ?.name;
-    }
-  );
+  const questionsWithFreeChoices: string[] =
+    store.getters["pollData/questionsWithFreeChoices"];
 
   const currQuestion = userQuestions.value.find(
     (question) => question.id === questionsIdsWithFreeChoices[0]
@@ -109,7 +105,7 @@ const addPollRow = () => {
 const removePollRow = (currRow: IPollRowStructure) => {
   const newUserQuestions = [...userQuestions.value];
 
-  const questionIndex = store.getters["pollData/questionIndexByName"](
+  const questionIndex: number = store.getters["pollData/questionIndexByName"](
     currRow.selectValFirst
   );
 
@@ -132,15 +128,8 @@ const removePollRow = (currRow: IPollRowStructure) => {
 
   const allFreeChoices: IFreeChoices =
     store.getters["pollData/freeQuestionsChoices"];
-  const questionsWithFreeChoices = Object.entries(allFreeChoices)
-    .filter(([questionId, freeChoicesIds]) => {
-      return freeChoicesIds.length > 0;
-    })
-    .map(([questionId, freeChoicesIds]) => {
-      return newUserQuestions.find(
-        (question) => question.id === Number(questionId)
-      )?.name;
-    });
+  const questionsWithFreeChoices: string[] =
+    store.getters["pollData/questionsWithFreeChoices"];
 
   const currQuestionFreeChoicesIds =
     allFreeChoices[userQuestions.value[questionIndex].id];
