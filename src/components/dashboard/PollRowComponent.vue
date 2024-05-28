@@ -141,11 +141,9 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
       : "Завершено";
 
   updatedUserQuestions[currQuestionIndex].choices.forEach((choice) => {
-    oldValue.forEach((oldChoice) => {
-      if (choice.value === oldChoice) {
-        delete choice.next_question;
-      }
-    });
+    if (currRow.value.selectValsSecond.includes(choice.value)) {
+      delete choice.next_question;
+    }
 
     if (nextQuestionId) {
       newValue.forEach((newChoice) => {
@@ -225,7 +223,10 @@ const changeSelectedValThird = (oldValue: string, newValue: string) => {
   )?.id;
 
   updatedUserQuestions[currQuestionIndex].choices.forEach((choice) => {
-    if (nextQuestionId) {
+    if (
+      nextQuestionId &&
+      currRow.value.selectValsSecond.includes(choice.value)
+    ) {
       choice.next_question = nextQuestionId;
     }
   });
