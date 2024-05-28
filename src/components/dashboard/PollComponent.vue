@@ -61,7 +61,7 @@ const addPollRow = () => {
     store.getters["pollData/freeQuestionsChoices"];
   const questionsIdsWithFreeChoices = Object.entries(allFreeChoices)
     .filter(([questionId, freeChoicesIds]) => {
-      return freeChoicesIds.length > 0;
+      return freeChoicesIds.length;
     })
     .map(([questionId, freeChoicesIds]) => {
       return Number(questionId);
@@ -69,7 +69,7 @@ const addPollRow = () => {
   const questionsWithFreeChoices = questionsIdsWithFreeChoices.map(
     (questionId) => {
       return userQuestions.value.find((question) => question.id === questionId)
-        .name;
+        ?.name;
     }
   );
   const currQuestion = userQuestions.value.find(
@@ -77,13 +77,15 @@ const addPollRow = () => {
   );
   const questionChoices = allFreeChoices[questionsIdsWithFreeChoices[0]].map(
     (choiceId) => {
-      const currChoice = currQuestion.choices.find(
+      const currChoice = currQuestion?.choices.find(
         (choice) => choice.id === choiceId
       );
-      return currChoice.value;
+      return currChoice?.value;
     }
   );
-  const nextQuestionsList = userQuestions.value.map((q) => q.name);
+  const nextQuestionsList = userQuestions.value.map(
+    (question) => question.name
+  );
   nextQuestionsList.push("Завершено");
 
   const newPollRow: IPollRowStructure = {
@@ -108,13 +110,15 @@ const removePollRow = (currRow: IPollRowStructure) => {
     }
   });
 
-  if (questionIndex !== -1) {
-    newUserQuestions[questionIndex].choices.forEach((choice) => {
-      if (currRow.selectValsSecond.includes(choice.value)) {
-        delete choice.next_question;
-      }
-    });
+  if (questionIndex === -1) {
+    return;
   }
+
+  newUserQuestions[questionIndex].choices.forEach((choice) => {
+    if (currRow.selectValsSecond.includes(choice.value)) {
+      delete choice.next_question;
+    }
+  });
 
   store.commit("pollData/setUserQuestions", newUserQuestions);
 
@@ -128,6 +132,10 @@ const removePollRow = (currRow: IPollRowStructure) => {
     }
   });
 
+  if (currQuestionIndex === -1) {
+    return;
+  }
+
   const allFreeChoices: IFreeChoices =
     store.getters["pollData/freeQuestionsChoices"];
   const questionsWithFreeChoices = Object.entries(allFreeChoices)
@@ -137,7 +145,7 @@ const removePollRow = (currRow: IPollRowStructure) => {
     .map(([questionId, freeChoicesIds]) => {
       return newUserQuestions.find(
         (question) => question.id === Number(questionId)
-      ).name;
+      )?.name;
     });
   const currQuestionFreeChoicesIds =
     allFreeChoices[userQuestions.value[currQuestionIndex].id];

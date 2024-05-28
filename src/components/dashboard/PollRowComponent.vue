@@ -72,19 +72,25 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
       return question;
     }
   });
+
+  if (oldQuestionIndex === -1) {
+    return;
+  }
+
   const currQuestionIndex = updatedUserQuestions.findIndex((question) => {
     if (question.name === newValue) {
       return question;
     }
   });
 
-  if (oldQuestionIndex !== -1) {
-    updatedUserQuestions[oldQuestionIndex].choices.forEach((choice) => {
-      if (currRow.value.selectValsSecond.includes(choice.value)) {
-        delete choice.next_question;
-      }
-    });
+  if (currQuestionIndex === -1) {
+    return;
   }
+  updatedUserQuestions[oldQuestionIndex].choices.forEach((choice) => {
+    if (currRow.value.selectValsSecond.includes(choice.value)) {
+      delete choice.next_question;
+    }
+  });
 
   emit("updateUserQuestions", updatedUserQuestions);
 
@@ -145,14 +151,12 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
       delete choice.next_question;
     }
 
-    if (nextQuestionId) {
-      newValue.forEach((newChoice) => {
-        if (choice.value === newChoice) {
-          choice.next_question =
-            nextQuestionId !== "Завершено" ? nextQuestionId : null;
-        }
-      });
-    }
+    newValue.forEach((newChoice) => {
+      if (choice.value === newChoice) {
+        choice.next_question =
+          nextQuestionId !== "Завершено" ? nextQuestionId : null;
+      }
+    });
   });
 
   emit("updateUserQuestions", updatedUserQuestions);
@@ -178,7 +182,7 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
     .map(([questionId, freeChoicesIds]) => {
       return updatedUserQuestions.find(
         (question) => question.id === Number(questionId)
-      ).name;
+      )?.name;
     });
   const currQuestionFreeChoicesIds =
     allFreeChoices[updatedUserQuestions[currQuestionIndex].id];
@@ -223,10 +227,7 @@ const changeSelectedValThird = (oldValue: string, newValue: string) => {
   )?.id;
 
   updatedUserQuestions[currQuestionIndex].choices.forEach((choice) => {
-    if (
-      nextQuestionId &&
-      currRow.value.selectValsSecond.includes(choice.value)
-    ) {
+    if (currRow.value.selectValsSecond.includes(choice.value)) {
       choice.next_question = nextQuestionId;
     }
   });

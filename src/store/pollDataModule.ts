@@ -39,13 +39,15 @@ const pollDataModule = defineModule({
           (serverQuestion) => serverQuestion.id === userQuestion.id
         );
 
-        if (serverQuestion) {
-          serverQuestion.choices.forEach((serverChoice) => {
-            if (!userChoicesSet.has(serverChoice.id)) {
-              freeChoices[serverQuestion.id].push(serverChoice.id);
-            }
-          });
+        if (!serverQuestion) {
+          return;
         }
+
+        serverQuestion.choices.forEach((serverChoice) => {
+          if (!userChoicesSet.has(serverChoice.id)) {
+            freeChoices[serverQuestion.id].push(serverChoice.id);
+          }
+        });
       }
 
       return freeChoices;
@@ -98,7 +100,7 @@ const pollDataModule = defineModule({
                 nextQuestionIdStr === "null"
                   ? "Завершено"
                   : serverQuestions.find(
-                      (q) => q.id === Number(nextQuestionIdStr)
+                      (question) => question.id === Number(nextQuestionIdStr)
                     )?.name,
               selectOptionsThird: nextQuestionsList,
             };
