@@ -65,10 +65,10 @@ const currRow = computed<IPollRowStructure>(() => {
 
 const store = useStore();
 
-const changeSelectedValFirst = (oldValue: string, newValue: string) => {
+const changeSelectedValFirst = (newValue: string) => {
   const updatedUserQuestions = [...props.userQuestions];
   const oldQuestionIndex = updatedUserQuestions.findIndex((question) => {
-    if (question.name === oldValue) {
+    if (question.name === currRow.value.selectValFirst) {
       return question;
     }
   });
@@ -127,7 +127,7 @@ const changeSelectedValFirst = (oldValue: string, newValue: string) => {
   emit("updatePollRows", updatedPollRows);
 };
 
-const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
+const changeSelectedValsSecond = (newValue: string[]) => {
   const updatedUserQuestions = [...props.userQuestions];
   const currQuestionIndex = updatedUserQuestions.findIndex((question) => {
     if (question.name === currRow.value.selectValFirst) {
@@ -210,7 +210,7 @@ const changeSelectedValsSecond = (oldValue: string[], newValue: string[]) => {
   emit("updatePollRows", updatedPollRows);
 };
 
-const changeSelectedValThird = (oldValue: string, newValue: string) => {
+const changeSelectedValThird = (newValue: string) => {
   const updatedUserQuestions = [...props.userQuestions];
   const currQuestionIndex = updatedUserQuestions.findIndex((question) => {
     if (question.name === currRow.value.selectValFirst) {
