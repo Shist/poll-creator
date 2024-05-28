@@ -13,8 +13,11 @@
         </div>
       </div>
 
-      <GraphComponent v-if="isLogicDiagram" />
-      <PollComponent v-else />
+      <keep-alive>
+        <component
+          :is="isLogicDiagram ? GraphComponent : PollComponent"
+        ></component>
+      </keep-alive>
 
       <div class="logic-buttons">
         <BaseButton

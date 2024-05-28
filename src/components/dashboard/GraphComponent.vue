@@ -3,7 +3,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ComputedRef, computed } from "vue";
+import { ComputedRef, computed, onActivated } from "vue";
 import { useStore } from "vuex";
 import { useGraph } from "@/composables/useGraph";
 import type { IQuestion } from "@/types/data/questions";
@@ -16,7 +16,7 @@ const userQuestions: ComputedRef<IQuestion[]> = computed(
   () => store.state.pollData.userQuestions
 );
 
-onMounted(() => {
+onActivated(() => {
   initCytoscapeGraph(userQuestions.value);
 });
 </script>
