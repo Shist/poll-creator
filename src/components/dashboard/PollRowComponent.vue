@@ -93,8 +93,8 @@ const changeSelectedValFirst = (newValue: string) => {
 
   const updatedPollRows = [...props.pollRows];
 
-  const currPollRowIndex = updatedPollRows.findIndex(
-    (pollRow: IPollRowStructure) => pollRow.rowId === props.rowId
+  const currPollRowIndex = store.getters["pollData/pollRowIndexByName"](
+    currRow.value.rowId
   );
 
   if (currPollRowIndex === -1) {
@@ -162,8 +162,8 @@ const changeSelectedValsSecond = (newValue: string[]) => {
 
   const updatedPollRows = [...props.pollRows];
 
-  const currPollRowIndex = updatedPollRows.findIndex(
-    (pollRow: IPollRowStructure) => pollRow.rowId === props.rowId
+  const currPollRowIndex = store.getters["pollData/pollRowIndexByName"](
+    currRow.value.rowId
   );
 
   if (currPollRowIndex === -1) {
@@ -235,8 +235,8 @@ const changeSelectedValThird = (newValue: string) => {
 
   const updatedPollRows = [...props.pollRows];
 
-  const currPollRowIndex = updatedPollRows.findIndex(
-    (pollRow: IPollRowStructure) => pollRow.rowId === props.rowId
+  const currPollRowIndex = store.getters["pollData/pollRowIndexByName"](
+    currRow.value.rowId
   );
 
   if (currPollRowIndex === -1) {

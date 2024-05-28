@@ -123,6 +123,16 @@ const pollDataModule = defineModule({
           }
         });
       },
+    // Returns the ID of the poll row from pollRows by its rowId
+    pollRowIndexByName:
+      (state) =>
+      (rowId: string): number => {
+        return state.pollRows.findIndex((pollRow) => {
+          if (pollRow.rowId === rowId) {
+            return pollRow;
+          }
+        });
+      },
   },
 
   mutations: {
