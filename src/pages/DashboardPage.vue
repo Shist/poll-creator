@@ -4,21 +4,26 @@
 
     <div class="main-block">
       <h1 class="px-5">Создание опроса</h1>
-      <div class="logic px-5">
+      <div class="logic">
         <TabsNavigation />
 
         <div class="d-flex align-items-center">
           <BaseSwitcher v-model="isLogicDiagram" />
-          <p class="ms-3 fs-5">Схема логики</p>
+          <p class="switch-label">Схема логики</p>
         </div>
       </div>
 
-      <!-- Тут нужно добавить компоненту для отображения формы и графа -->
+      <keep-alive>
+        <component
+          :is="isLogicDiagram ? GraphComponent : PollComponent"
+        ></component>
+      </keep-alive>
 
       <div class="logic-buttons">
         <BaseButton
           name="Публикация опроса"
           class="btn-primary btn-width me-4"
+          :disabled="!store.getters['pollData/areAllChoicesPresent']"
         />
         <BaseButton name="Отмена" class="btn-width" />
       </div>
@@ -27,14 +32,30 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue";
-
+import { ref, onMounted } from "vue";
+import { useStore } from "vuex";
 import BaseButton from "@/components/base/BaseButton.vue";
 import AsideNavigation from "@/components/AsideNavigation.vue";
 import TabsNavigation from "@/components/TabsNavigation.vue";
 import BaseSwitcher from "@/components/base/BaseSwitcher.vue";
+import PollComponent from "@/components/dashboard/PollComponent.vue";
+import GraphComponent from "@/components/dashboard/GraphComponent.vue";
+import { questionsFromServer } from "@/data";
 
 const isLogicDiagram = ref<boolean>(false);
+
+const store = useStore();
+
+onMounted(() => {
+  store.commit("pollData/setServerQuestions", questionsFromServer);
+
+  store.commit("pollData/setUserQuestions", questionsFromServer);
+
+  store.commit(
+    "pollData/setPollRows",
+    store.getters["pollData/initPollRowsStructure"]
+  );
+});
 </script>
 
 <style lang="scss" scoped>
@@ -43,13 +64,30 @@ const isLogicDiagram = ref<boolean>(false);
 .main-block {
   width: 100%;
   margin: 0;
-  padding: 2.5rem 0 2.5rem 17.5rem;
+  padding: 2.5rem 0 103px 17.5rem;
+  @media (max-width: 1280px) {
+    padding: 2.5rem 0 103px 0;
+  }
 }
 
 .logic {
   display: flex;
   justify-content: space-between;
-  padding: 2.25rem 0;
+  padding: 2.25rem;
+  @media (max-width: 1280px) {
+    padding: 1.5rem;
+  }
+}
+
+.switch-label {
+  margin-left: 8px;
+  font-size: 20px;
+  @media (max-width: 1024px) {
+    font-size: 18px;
+  }
+  @media (max-width: 864px) {
+    font-size: 16px;
+  }
 }
 
 .logic-buttons {

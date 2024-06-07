@@ -1,6 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "@/router";
+import store from "@/store";
 import nodeHtmlLabel from "cytoscape-node-html-label";
 import cytoscape from "cytoscape";
 
@@ -13,6 +14,7 @@ import "./styles/main.scss";
 const app = createApp(App);
 
 app.use(router);
+app.use(store.original);
 app.component("v-select", vSelect);
 app.mount("#app");
 

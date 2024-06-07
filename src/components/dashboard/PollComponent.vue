@@ -1,110 +1,161 @@
 <template>
-  <div></div>
+  <div class="poll-wrapper">
+    <h2 class="poll-wrapper__headline">Создание логики</h2>
+    <p class="poll-wrapper__text">
+      Пожалуйста, для успешной настройки логики заполните сценарии для всех
+      вопросов и всех вариантов ответов.
+    </p>
+    <div class="poll-wrapper__poll-rows-wrapper">
+      <PollRowComponent
+        v-for="pollRow in pollRows"
+        :key="pollRow.rowId"
+        :rowId="pollRow.rowId"
+        :userQuestions="userQuestions"
+        @updateUserQuestions="handleUserQuestionsUpdate"
+        :pollRows="pollRows"
+        @updatePollRows="handlePollRowsUpdate"
+        @removePollRow="removePollRow"
+      />
+      <button
+        @click="addPollRow"
+        class="poll-wrapper__add-poll-row-btn"
+        v-show="!store.getters['pollData/areAllChoicesPresent']"
+      >
+        + Добавить условие
+      </button>
+    </div>
+  </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ComputedRef, computed } from "vue";
+import { useStore } from "vuex";
+import PollRowComponent from "@/components/dashboard/PollRowComponent.vue";
+import { IPollRowStructure, IQuestion } from "@/types/data/questions";
+import { v4 as uuidv4 } from "uuid";
 
-import type { IQuestion } from "@/types/data/questions";
+const store = useStore();
 
-const questions = ref<IQuestion[]>([]);
+const userQuestions: ComputedRef<IQuestion[]> = computed(
+  () => store.state.pollData.userQuestions
+);
 
-onMounted(() => {
-  questions.value = [
-    {
-      id: 1,
-      name: "Какие языки вы знаете?",
-      choices: [
-        {
-          id: 1,
-          value: "JS",
-          next_question: 2,
-        },
-        {
-          id: 2,
-          value: "NodeJS",
-          next_question: 2,
-        },
-        {
-          id: 3,
-          value: "TS",
-          next_question: 2,
-        },
-      ],
-    },
-    {
-      id: 2,
-      name: "Какие фреймворки вы знаете/изучали?",
-      choices: [
-        {
-          id: 4,
-          value: "Vue",
-          next_question: 3,
-        },
-        {
-          id: 5,
-          value: "React",
-          next_question: 3,
-        },
-        {
-          id: 6,
-          value: "Angular",
-          next_question: 3,
-        },
-        {
-          id: 7,
-          value: "Express",
-          next_question: null,
-        },
-        {
-          id: 8,
-          value: "Nest",
-          next_question: null,
-        },
-      ],
-    },
-    {
-      id: 3,
-      name: "Какие паттерны проектирования вы применяли на проектах?",
-      choices: [
-        {
-          id: 9,
-          value: "Фабричный",
-          next_question: 4,
-        },
-        {
-          id: 10,
-          value: "Строитель",
-          next_question: 4,
-        },
-        {
-          id: 11,
-          value: "Стратегия",
-          next_question: 4,
-        },
-        {
-          id: 12,
-          value: "Модуль",
-          next_question: 4,
-        },
-      ],
-    },
-    {
-      id: 4,
-      name: "Какие бенефиты вы бы хотели иметь?",
-      choices: [
-        {
-          id: 13,
-          value: "Тренажерный зал",
-          next_question: null,
-        },
-        {
-          id: 14,
-          value: "Курсы англиского",
-          next_question: null,
-        },
-      ],
-    },
-  ];
-});
+const pollRows: ComputedRef<IPollRowStructure[]> = computed(
+  () => store.state.pollData.pollRows
+);
+
+const handleUserQuestionsUpdate = (updatedUserQuestions: IQuestion[]) => {
+  store.commit("pollData/setUserQuestions", updatedUserQuestions);
+};
+
+const handlePollRowsUpdate = (updatedPollRows: IPollRowStructure[]) => {
+  store.commit("pollData/setPollRows", updatedPollRows);
+};
+
+const addPollRow = () => {
+  const updatedPollRows = [...pollRows.value];
+
+  const questionsIdsWithFreeChoices: number[] =
+    store.getters["pollData/questionsIdsWithFreeChoices"];
+
+  const questionsWithFreeChoices: string[] =
+    store.getters["pollData/questionsWithFreeChoices"];
+
+  const questionChoices = store.getters["pollData/questionFreeChoicesById"](
+    questionsIdsWithFreeChoices[0]
+  );
+
+  const nextQuestionsList = userQuestions.value.map(
+    (question) => question.name
+  );
+  nextQuestionsList.push("Завершено");
+
+  const newPollRow: IPollRowStructure = {
+    rowId: `${questionsIdsWithFreeChoices[0]}|${uuidv4()}`,
+    selectValFirst: questionsWithFreeChoices[0],
+    selectOptionsFirst: questionsWithFreeChoices,
+    selectValsSecond: [],
+    selectOptionsSecond: questionChoices,
+    selectValThird: "Завершено",
+    selectOptionsThird: nextQuestionsList,
+  };
+
+  updatedPollRows.push(newPollRow);
+  store.commit("pollData/setPollRows", updatedPollRows);
+};
+
+const removePollRow = (currRow: IPollRowStructure) => {
+  const newUserQuestions = [...userQuestions.value];
+
+  const questionIndex: number = store.getters["pollData/questionIndexByName"](
+    currRow.selectValFirst
+  );
+
+  if (questionIndex === -1) {
+    return;
+  }
+
+  newUserQuestions[questionIndex].choices.forEach((choice) => {
+    if (currRow.selectValsSecond.includes(choice.value)) {
+      delete choice.next_question;
+    }
+  });
+
+  store.commit("pollData/setUserQuestions", newUserQuestions);
+
+  const updatedPollRows = pollRows.value.filter(
+    (pollRow) => pollRow.rowId !== currRow.rowId
+  );
+
+  const questionsWithFreeChoices: string[] =
+    store.getters["pollData/questionsWithFreeChoices"];
+
+  const currQuestionFreeChoices = store.getters[
+    "pollData/questionFreeChoicesById"
+  ](newUserQuestions[questionIndex].id);
+
+  updatedPollRows.forEach((pollRow) => {
+    pollRow.selectOptionsFirst = questionsWithFreeChoices;
+  });
+
+  updatedPollRows.forEach((pollRow) => {
+    if (
+      pollRow.rowId.split("|")[0] ===
+      newUserQuestions[questionIndex].id.toString()
+    ) {
+      pollRow.selectOptionsSecond = currQuestionFreeChoices;
+    }
+  });
+
+  store.commit("pollData/setPollRows", updatedPollRows);
+};
 </script>
+
+<style lang="scss">
+@import "../../styles/colors.scss";
+
+.poll-wrapper {
+  padding-inline: 2.25rem;
+  @media (max-width: 1280px) {
+    padding: 1.5rem;
+  }
+  &__headline {
+    margin-bottom: 20px;
+  }
+  &__text {
+    margin-bottom: 15px;
+  }
+  &__poll-rows-wrapper {
+    display: flex;
+    flex-direction: column;
+    row-gap: 10px;
+    .poll-wrapper__add-poll-row-btn {
+      padding: 5px;
+      align-self: flex-start;
+      border: none;
+      background-color: $white;
+      color: $text;
+    }
+  }
+}
+</style>

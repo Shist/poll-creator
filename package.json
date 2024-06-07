@@ -14,9 +14,12 @@
     "bootstrap": "^5.3.3",
     "cytoscape": "^3.28.1",
     "cytoscape-node-html-label": "^1.2.2",
+    "direct-vuex": "^0.12.1",
+    "uuid": "^9.0.1",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0",
-    "vue-select": "^4.0.0-beta.6"
+    "vue-select": "^4.0.0-beta.6",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@tsconfig/node20": "^20.1.2",

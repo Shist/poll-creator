@@ -3,27 +3,26 @@
 </template>
 
 <script lang="ts" setup>
-import { watch } from "vue";
-
+import { ComputedRef, computed, onActivated } from "vue";
+import { useStore } from "vuex";
 import { useGraph } from "@/composables/useGraph";
-
 import type { IQuestion } from "@/types/data/questions";
 
 const { initCytoscapeGraph } = useGraph();
 
-const props = defineProps<{ questions: IQuestion[] }>();
+const store = useStore();
 
-watch(
-  () => props.questions,
-  (val) => {
-    initCytoscapeGraph(val);
-  },
-  { deep: true, immediate: true }
+const userQuestions: ComputedRef<IQuestion[]> = computed(
+  () => store.state.pollData.userQuestions
 );
+
+onActivated(() => {
+  initCytoscapeGraph(userQuestions.value);
+});
 </script>
 
 <style lang="scss">
-@import "../../../styles/colors.scss";
+@import "../../styles/colors.scss";
 
 #cytoscape-graph {
   height: 60vh;

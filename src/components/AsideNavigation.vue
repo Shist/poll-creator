@@ -57,6 +57,9 @@ aside {
   border-right: 1px solid $border;
   padding: 2rem 1.5rem;
   background-color: $sidebarColor;
+  @media (max-width: 1280px) {
+    display: none;
+  }
 
   li {
     width: 100%;

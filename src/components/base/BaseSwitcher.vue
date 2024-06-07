@@ -29,6 +29,7 @@ const inputValue = (e: Event): void => {
   position: relative;
   display: inline-block;
   width: 60px;
+  min-width: 60px;
   height: 32px;
 }
 

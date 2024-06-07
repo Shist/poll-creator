@@ -19,10 +19,12 @@
 import type { BaseSelectProps } from "@/types/props";
 
 defineProps<BaseSelectProps<any>>();
-const emit = defineEmits<{ change: [value: any] }>();
+const emit = defineEmits<{
+  change: [newValue: string | string[]];
+}>();
 
-const inputValue = (e: any): void => {
-  emit("change", e);
+const inputValue = (newValue: string | string[]): void => {
+  emit("change", newValue);
 };
 </script>
 
